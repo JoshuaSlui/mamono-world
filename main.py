@@ -18,8 +18,11 @@ async def on_connect() -> None:
     title VARCHAR(255) NOT NULL,
     description VARCHAR(500),
     channel BIGINT NOT NULL,
+    message BIGINT NOT NULL,
     closing_date BIGINT,
     author BIGINT NOT NULL,
+    voting_cap INT,
+    votes_per_user INT,
     status varchar(255) NOT NULL DEFAULT 'open')
     """)
     await execute("""
@@ -43,6 +46,14 @@ async def on_connect() -> None:
         FOREIGN KEY (response) REFERENCES responses (id) ON DELETE CASCADE
     )
     """)
+    await execute("""
+    CREATE TABLE IF NOT exists activity (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        author_name VARCHAR(255) NOT NULL,
+        author_id BIGINT NOT NULL,
+        date TEXT NOT NULL
+    )
+    """)
     bot.load_extensions("modules", recursive=True)
 
 @bot.listen()
@@ -61,6 +72,13 @@ async def on_disconnect() -> None:
     print('Disconnecting from discord...')
     await db_pool.close_pool()
     await bot.close()
+
+@bot.event
+async def on_message(message):
+    if message.author.id == bot.user.id:
+        return
+
+    await execute("INSERT INTO activity (author_name, author_id, date) VALUES (%s, %s, %s)", [message.author.name, message.author.id, message.created_at])
 
 
 bot.run(config('bot_token'))

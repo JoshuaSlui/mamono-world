@@ -33,3 +33,4 @@ async def execute(statement: str, args: [] = None):
     except aiomysql.Error as err:
         await conn.rollback()
         print('An aiomysql error occurred while executing a statement:\n{}\n-----\nArgs: {}\nError: {}'.format(statement, args, err))
+        return aiomysql.Error

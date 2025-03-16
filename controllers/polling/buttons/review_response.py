@@ -1,3 +1,5 @@
+from code import interact
+
 import discord
 
 from controllers.database import execute
@@ -24,9 +26,24 @@ class ReviewResponse(discord.ui.View):  # Create a class called MyView that subc
         super().__init__(timeout=None)
     @discord.ui.button(label="Accept Response", custom_id='acceptResponseButton', style=discord.ButtonStyle.success)  # Create a button with the label "😎 Click me!" with color Blurple
     async def accept_button_callback(self, button, interaction):
-        await execute("UPDATE responses SET status = %s WHERE author = %s", ['accepted', interaction.message])
-        await interaction.message.edit('Response has been processed as accepted')
+        await interaction.response.defer()
+        self.clear_items()
+        embed = interaction.message.embeds[0]
+        embed.colour = discord.Color.green()
+        embed.title = 'Approved response'
+
+        await execute("UPDATE responses SET status = %s WHERE author = %s", ['accepted', interaction.user.id])
+        await interaction.message.edit(embed=embed, view=None)
+        return await interaction.user.send('Hi there! Your suggestion for the poll has been accepted and will be added. Thank you!!!!')
 
     @discord.ui.button(label="Deny Response", custom_id='denyResponseButton', style=discord.ButtonStyle.danger)
     async def deny_button_callback(self, button, interaction):
-        await interaction.response.send_modal(DeniedResponse(title="Deny Response"))
+        await interaction.response.defer()
+        self.clear_items()
+        embed = interaction.message.embeds[0]
+        embed.colour = discord.Color.red()
+        embed.title = 'Denied response'
+
+        await execute("UPDATE responses SET status = %s WHERE author = %s", ['denied', interaction.user.id])
+        await interaction.message.edit(embed=embed, view=None)
+        return await interaction.user.send('Hi there! We apologize but your suggestion for the poll has been declined at this time.')
