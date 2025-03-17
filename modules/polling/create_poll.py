@@ -69,25 +69,7 @@ class CreatePoll(discord.Cog):
         poll = await execute("SELECT * FROM polls WHERE status = %s", ['open'])
         poll = poll[0]
 
-        response_amount = await execute("""
-            SELECT COUNT(r.id) AS count, p.id AS poll_id
-            FROM polls p, responses r
-            WHERE p.status = 'voting' AND r.poll = p.id;
-        """)
-        response_amount = response_amount[0]
-
-        active_users = await execute("SELECT COUNT(DISTINCT author_id) AS count FROM activity WHERE date >= NOW() - INTERVAL 7 DAY")
-        active_users = active_users[0]['count']
-
-        votes_per_user = 1 if response_amount['count'] <= 3 else response_amount['count'] // 3
-        print(active_users, votes_per_user)
-        total_votes = active_users // votes_per_user
-        scaling_factor = min(1, 100/total_votes)
-        scaled_votes_per_user = floor(votes_per_user * scaling_factor)
-        scaled_total_votes = active_users * scaled_votes_per_user
-        final_total_votes = min(scaled_total_votes, 200) if scaled_total_votes > 100 else 100
-
-        await execute("UPDATE polls SET status = %s, voting_cap = %s, votes_per_user = %s WHERE id = %s", ('voting', final_total_votes, scaled_votes_per_user, poll['id']))
+        await execute("UPDATE polls SET status = %s WHERE id = %s", ('voting', poll['id']))
         poll['status'] = 'voting'
         responses = await execute("SELECT * FROM responses WHERE poll = %s", [poll['id']])
         message = await self.bot.get_channel(poll['channel']).fetch_message(poll['message'])
