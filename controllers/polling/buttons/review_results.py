@@ -4,10 +4,6 @@ import discord
 
 from controllers.database import execute
 
-# TODO: Update status of response based on author id
-# TODO: add logic for denying a response
-
-
 class ReviewResults(discord.ui.View):  # Create a class called MyView that subclasses discord.ui.View
     def __init__(self, bot: discord.Bot) -> None:
         super().__init__(timeout=None)
