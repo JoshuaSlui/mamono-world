@@ -19,7 +19,8 @@ class ResponseModal(discord.ui.Modal):
         embed.title = f"New poll suggestion!"
         embed.description = self.children[0].value
         embed.set_author(name=interaction.user.name, icon_url=interaction.user.avatar.url)
-        await self.bot.get_channel(config('review_channel')).send(embed=embed, view=ReviewResponse())
+        await self.bot.get_channel(config('review_channel')).send(embed=embed, view=ReviewResponse(self.bot))
+        await interaction.response.send_message('Your suggestion has been saved and will be reviewed shortly!', ephemeral=True)
 
 class AddResponse(discord.ui.View):  # Create a class called MyView that subclasses discord.ui.View
     def __init__(self) -> None:
@@ -38,4 +39,4 @@ class AddResponse(discord.ui.View):  # Create a class called MyView that subclas
         if open_poll:
             return await interaction.response.send_message('Sorry, you already submitted a response. You can only submit one per poll.', ephemeral=True)
 
-        return await interaction.response.send_modal(ResponseModal(title="Add response!", bot=interaction.client))
+        await interaction.response.send_modal(ResponseModal(title="Add response!", bot=interaction.client))

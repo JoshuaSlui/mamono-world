@@ -6,6 +6,7 @@ from discord.ext import commands
 
 from controllers.database import execute
 from controllers.polling.buttons.add_response import AddResponse
+from controllers.polling.buttons.review_results import ReviewResults
 from controllers.utility import config
 
 
@@ -29,8 +30,9 @@ class CreatePoll(discord.Cog):
         """
         Create a free-response poll
         """
+        await ctx.defer(ephemeral=True)
         if not channel:
-            channel = ctx.channel
+            channel = await self.bot.fetch_channel(config('default_poll_channel'))
 
         epoch = int(time.time()) + days_left * (60 * 60 * 24) if days_left else None
 
@@ -56,10 +58,14 @@ class CreatePoll(discord.Cog):
             INSERT INTO polls(title, description, channel, message, closing_date, author)
             VALUES (%s, %s, %s, %s, %s, %s)
         """, [title, description, channel.id, message.id, epoch, ctx.author.id])
+        
+        return await ctx.followup.send('The poll has been made successfully.')
+
 
     @close.command()
     @commands.has_role(config('admin_role'))
     async def responses(self, ctx):
+        await ctx.defer(ephemeral=True)
         poll = await execute("SELECT * FROM polls WHERE status = %s", ['open'])
         poll = poll[0]
 
@@ -103,12 +109,13 @@ class CreatePoll(discord.Cog):
         """
 
         await message.edit(embed=embed, view=None)
-
-        return await ctx.respond([poll, responses])
+        return await ctx.followup.send('responses have been closed successfully.')
 
     @close.command()
     @commands.has_role(config('admin_role'))
     async def votes(self, ctx):
+        await ctx.defer(ephemeral=True)
+
         poll = await execute("SELECT * FROM polls WHERE status = %s", ['voting'])
         poll = poll[0]
 
@@ -124,8 +131,6 @@ class CreatePoll(discord.Cog):
             ORDER BY vote_count DESC;
         """, [poll['id']])
 
-        await ctx.respond(vote_results)
-
         result_message = ""
         for result in vote_results:
             result_message += f"**{result['description']}**\nVote count: `{result['vote_count']}`\n\n"
@@ -138,9 +143,8 @@ class CreatePoll(discord.Cog):
         {result_message}
 """
 
-        await self.bot.get_channel(config('review_channel')).send(embed=embed)
-        # message = await self.bot.get_channel(poll['channel']).fetch_message(poll['message'])
-
+        await self.bot.get_channel(config('review_channel')).send(embed=embed, view=ReviewResults(self.bot))
+        return await ctx.followup.send('Votes have been closed successfully.')
 
 
 def setup(bot: discord.Bot):

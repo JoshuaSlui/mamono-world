@@ -28,6 +28,7 @@ class VotePoll(discord.Cog):
     @commands.command()
     @discord.option(name="suggestion", required=True, autocomplete=suggestion_check)
     async def vote(self, ctx, suggestion):
+        await ctx.defer(ephemeral=True)
         suggestions = await suggestion_check(self)
         suggestions = [response.value for response in suggestions]
         if suggestion not in suggestions:
@@ -49,7 +50,7 @@ class VotePoll(discord.Cog):
         await execute("INSERT INTO votes (author, poll, response) VALUES (%s, %s, %s)", [ctx.author.id, poll[0]['id'], suggestion])
         suggestion = await execute("SELECT * FROM responses WHERE id = %s", [suggestion])
 
-        return await ctx.respond(f'Your vote has been saved! Thank you!\nVoted for: {suggestion[0]['description']}')
+        return await ctx.followup.send(f'Your vote has been saved! Thank you!\nVoted for: {suggestion[0]['description']}')
 
 
 def setup(bot: discord.Bot):
