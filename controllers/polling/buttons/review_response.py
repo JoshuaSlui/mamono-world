@@ -35,4 +35,4 @@ class ReviewResponse(discord.ui.View):  # Create a class called MyView that subc
         response = await execute("SELECT * FROM responses WHERE description = %s", [embed.description])
         user = await self.bot.fetch_user(response[0]['author'])
         await interaction.message.edit(embed=embed, view=None)
-        return await user.send('Hi there! We apologize but your suggestion for the poll has been declined at this time.')
+        return await user.send('Your suggestion has been denied because it was deemed inappropiate or was already suggested.')
