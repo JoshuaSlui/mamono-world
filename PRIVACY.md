@@ -47,8 +47,7 @@ personal information to third parties.
 > can be found [here](https://discord.com/privacy). Discord may only occasionally
 > receive your account ID and username to provide our services.
 
-> **OVH**: We use OVH to host our services. OVH's privacy policy can be found
-> [here](https://www.ovh.com/world/privacy-policy/). All data is stored on OVH's
+> **OVH**: We use OVH to host our services. All data is stored on OVH's
 > servers using a secure mariaDB installation located in the European Union (EU).
 > This means your data is subject to EU data protection laws, including GDPR.
 
