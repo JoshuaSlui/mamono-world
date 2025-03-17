@@ -7,7 +7,7 @@ Personal Information and how you can access and update this information.
 
 This policy does not apply to the practices of companies that we do not
 own or control, or to individuals that we do not employ or manage. Such as
-the Discord (legally, "Discord Inc." and/or "Discord Netherlands B.V.) platform,
+the Discord (legally, "Discord Inc." and/or "Discord Netherlands B.V.") platform,
 which we use to provide our services. Discord's privacy policy can be found
 [here](https://discord.com/privacy).
 
