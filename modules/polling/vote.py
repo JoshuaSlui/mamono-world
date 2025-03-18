@@ -36,16 +36,10 @@ class VotePoll(discord.Cog):
 
         poll = await execute("SELECT * FROM polls WHERE status = %s", ['voting'])
 
-        current_votes = await execute("SELECT COUNT(id) AS count FROM votes WHERE poll = %s", [poll[0]['id']])
         votes_by_user = await execute("SELECT COUNT(author) AS count FROM votes WHERE poll = %s AND author = %s", [poll[0]['id'], ctx.author.id])
 
-        current_votes = current_votes[0]
-
-        if votes_by_user and votes_by_user[0]['count'] + 1 > poll[0]['votes_per_user']:
-            return await ctx.respond('You have reached your limit of votes for this poll.', ephemeral=True)
-
-        if current_votes == poll[0]['voting_cap']:
-            return await ctx.respond('The poll has reached the voting limit.', ephemeral=True)
+        if votes_by_user and votes_by_user[0]['count'] == 5:
+            return await ctx.respond('You have reached your limit of five votes for this poll.', ephemeral=True)
 
         await execute("INSERT INTO votes (author, poll, response) VALUES (%s, %s, %s)", [ctx.author.id, poll[0]['id'], suggestion])
         suggestion = await execute("SELECT * FROM responses WHERE id = %s", [suggestion])
