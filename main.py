@@ -21,8 +21,6 @@ async def on_connect() -> None:
     message BIGINT NOT NULL,
     closing_date BIGINT,
     author BIGINT NOT NULL,
-    voting_cap INT,
-    votes_per_user INT,
     status varchar(255) NOT NULL DEFAULT 'open')
     """)
     await execute("""
