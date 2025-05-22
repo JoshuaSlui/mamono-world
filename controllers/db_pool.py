@@ -1,6 +1,6 @@
 import asyncio
 import aiomysql
-from controllers.utility import config
+from controllers.utility import Config
 
 class DBPool:
     _instance = None
@@ -17,12 +17,13 @@ class DBPool:
 
     async def init_pool(self):
         if not self.initialized:
+            config = Config()
             self.pool = await aiomysql.create_pool(
-                host=config('db_host', 'localhost'),
-                port=config('db_port', 3306),
-                user=config('db_username'),
-                password=config('db_password'),
-                db=config('database'),
+                host=config.get('db_host', 'localhost'),
+                port=config.get('db_port', 3306),
+                user=config.get('db_username'),
+                password=config.get('db_password'),
+                db=config.get('database'),
                 loop=asyncio.get_event_loop(),
                 autocommit=True,
                 maxsize=10,  # Adjust the pool size as needed

@@ -12,7 +12,6 @@ async def execute(statement: str, args: [] = None):
         raise ConnectionAbortedError('A connection with the pool could not be established as the pool could not be found')
 
     try:
-        print(f'Executing statement: {statement} with args {args}')
         async with pool.acquire() as conn:
             async with conn.cursor() as cursor:
                 with warnings.catch_warnings():
