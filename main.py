@@ -39,11 +39,7 @@ async def on_connect() -> None:
     );
     """
     )
-    try:
-        bot.load_extensions("modules", recursive=True)
-    except NoEntryPointError as error:
-        print("[DEBUG] One or more files are missing entry points. Are these just init files?")
-        pass
+    config.load_extensions(bot, exclude=["modals.py", "utility.py"])
 
 @bot.listen()
 async def on_reconnect() -> None:
