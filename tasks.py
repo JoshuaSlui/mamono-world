@@ -6,18 +6,8 @@ import discord
 from discord.ext import tasks
 
 from ORM.models.User import User
-from ORM.models.Birthday import Birthday
 from controllers.utility import Config
-
-
-async def check_user_birthday(user):
-    birthday = await Birthday.get(user.id)
-    if not birthday:
-        return
-
-    today = datetime.now(ZoneInfo("America/New_York")).date()
-    if birthday.date.day == today.day and birthday.date.month == today.month:
-        return True
+from modules.checks.utility import check_user_birthday
 
 
 async def wait_until_midnight_est():
@@ -28,12 +18,12 @@ async def wait_until_midnight_est():
     await asyncio.sleep(delta)
 
 @tasks.loop(hours=24)
-async def birthday_check_loop(bot: discord.Bot, channel: discord.TextChannel, guild: discord.Guild):
+async def birthday_check_loop(channel: discord.TextChannel, guild: discord.Guild):
     print("🎂 Running birthday check loop...")
     users = await User.all()
     for user in users:
         try:
-            is_birthday = await check_user_birthday(user, bot)
+            is_birthday = await check_user_birthday(user)
             if is_birthday:
                 user = guild.get_member(user.id)
                 embed = discord.Embed()
