@@ -1,6 +1,7 @@
 import discord
 from discord import slash_command, Embed
 
+
 class Info(discord.Cog):
     def __init__(self, bot: discord.Bot):
         self.bot = bot
@@ -13,7 +14,6 @@ class Info(discord.Cog):
 **API Latency:** {round(self.bot.latency * 1000)}ms
 """
         await ctx.respond(embed=embed)
-
 
 
 def setup(bot: discord.Bot):

@@ -1,4 +1,4 @@
-from ORM.models.baseORM import AsyncORMBase
+from ORM import AsyncORMBase
 from controllers.database import execute
 
 
@@ -8,8 +8,11 @@ class Birthday(AsyncORMBase):
 
     @classmethod
     async def create_or_update(cls, user_id, date):
-        await execute("""
+        await execute(
+            """
             INSERT INTO birthdays (id, date) VALUES (%s, %s)
             ON DUPLICATE KEY UPDATE date = VALUES(date), updated_at = CURRENT_TIMESTAMP
-        """, [user_id, date])
+        """,
+            [user_id, date],
+        )
         return await cls.get(user_id)

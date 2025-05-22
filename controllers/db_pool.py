@@ -2,6 +2,7 @@ import asyncio
 import aiomysql
 from controllers.utility import Config
 
+
 class DBPool:
     _instance = None
 
@@ -11,7 +12,7 @@ class DBPool:
         return cls._instance
 
     def __init__(self):
-        if not hasattr(self, 'initialized'):  # Ensure pool is initialized only once
+        if not hasattr(self, "initialized"):  # Ensure pool is initialized only once
             self.pool = None
             self.initialized = False
 
@@ -19,11 +20,11 @@ class DBPool:
         if not self.initialized:
             config = Config()
             self.pool = await aiomysql.create_pool(
-                host=config.get('db_host', 'localhost'),
-                port=config.get('db_port', 3306),
-                user=config.get('db_username'),
-                password=config.get('db_password'),
-                db=config.get('database'),
+                host=config.get("db_host", "localhost"),
+                port=config.get("db_port", 3306),
+                user=config.get("db_username"),
+                password=config.get("db_password"),
+                db=config.get("database"),
                 loop=asyncio.get_event_loop(),
                 autocommit=True,
                 maxsize=10,  # Adjust the pool size as needed

@@ -28,17 +28,22 @@ class AsyncORMBase:
         instance = await cls.get(pk)
         if instance:
             return instance
-        await execute(f"INSERT INTO {cls.table_name} ({cls.pk_field}) VALUES (%s) ON DUPLICATE KEY UPDATE {cls.pk_field}={cls.pk_field}", [pk])
+        await execute(
+            f"INSERT INTO {cls.table_name} ({cls.pk_field}) VALUES (%s) ON DUPLICATE KEY UPDATE {cls.pk_field}={cls.pk_field}",
+            [pk],
+        )
         return await cls.get(pk)
 
     async def save(self):
-        columns = [k for k in self.__dict__.keys() if not k.startswith('_')]
+        columns = [k for k in self.__dict__.keys() if not k.startswith("_")]
         values = [getattr(self, col) for col in columns]
 
         placeholders = ", ".join(["%s"] * len(columns))
         column_list = ", ".join(columns)
 
-        update_clause = ", ".join(f"{col} = VALUES({col})" for col in columns if col != self.pk_field)
+        update_clause = ", ".join(
+            f"{col} = VALUES({col})" for col in columns if col != self.pk_field
+        )
 
         query = f"""
             INSERT INTO {self.table_name} ({column_list})
@@ -48,6 +53,8 @@ class AsyncORMBase:
         await execute(query, values)
 
     async def delete(self):
-        await execute(f"DELETE FROM {self.table_name} WHERE {self.pk_field} = %s", [getattr(self, self.pk_field)])
+        await execute(
+            f"DELETE FROM {self.table_name} WHERE {self.pk_field} = %s",
+            [getattr(self, self.pk_field)],
+        )
         return True
-

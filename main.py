@@ -8,13 +8,20 @@ from tasks import start_birthday_tasks
 
 intents = Intents(messages=True, guilds=True, members=True, message_content=True)
 
-bot = Bot(intents=intents, status=Status.online, activity=Activity(type=ActivityType.streaming, name="Starting..."), debug_guilds=[1189254335129976862])
+bot = Bot(
+    intents=intents,
+    status=Status.online,
+    activity=Activity(type=ActivityType.streaming, name="Starting..."),
+    debug_guilds=[1189254335129976862],
+)
+
 
 @bot.listen()
 async def on_connect() -> None:
-    print('Connecting to discord...')
+    print("Connecting to discord...")
     await db_pool.init_pool()
-    await execute("""
+    await execute(
+        """
     CREATE TABLE IF NOT EXISTS users (
         id BIGINT PRIMARY KEY,
         is_superuser BOOLEAN DEFAULT FALSE,
@@ -30,27 +37,34 @@ async def on_connect() -> None:
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
     );
-    """)
+    """
+    )
 
     bot.load_extensions("modules", recursive=True)
 
+
 @bot.listen()
 async def on_reconnect() -> None:
-    print('Reconnecting to discord...')
+    print("Reconnecting to discord...")
+
 
 @bot.listen()
 async def on_ready() -> None:
-    print(f'Authenticating as {bot.user}')
-    print(f'------------------{len(str(bot.user)) * '-'}')
-    await bot.change_presence(activity=Activity(type=ActivityType.streaming, name="Watching Mamono"))
+    print(f"Authenticating as {bot.user}")
+    print(f"------------------{len(str(bot.user)) * '-'}")
+    await bot.change_presence(
+        activity=Activity(type=ActivityType.streaming, name="Watching Mamono")
+    )
     print(f'Authenticated with modules:\n{"\n".join(bot.extensions).replace('.', '/')}')
     await start_birthday_tasks(bot)
 
+
 @bot.listen()
 async def on_disconnect() -> None:
-    print('Disconnecting from discord...')
+    print("Disconnecting from discord...")
     await db_pool.close_pool()
     await bot.close()
 
+
 config = Config()
-bot.run(config.get('bot_token'))
+bot.run(config.get("bot_token"))

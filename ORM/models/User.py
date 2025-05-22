@@ -1,4 +1,3 @@
-from ORM.models.Birthday import Birthday
 from ORM.models.baseORM import AsyncORMBase
 
 

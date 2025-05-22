@@ -12,10 +12,13 @@ from modules.checks.utility import check_user_birthday
 
 async def wait_until_midnight_est():
     now = datetime.now(ZoneInfo("America/New_York"))
-    tomorrow = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+    tomorrow = (now + timedelta(days=1)).replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
     delta = (tomorrow - now).total_seconds()
     print(f"⏱ Waiting {int(delta)} seconds until midnight EST/EDT...")
     await asyncio.sleep(delta)
+
 
 @tasks.loop(hours=24)
 async def birthday_check_loop(channel: discord.TextChannel, guild: discord.Guild):

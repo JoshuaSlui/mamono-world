@@ -1,5 +1,8 @@
-from datetime import datetime
+"""
+Central file for all modals relating to birthday commands.
+"""
 
+from datetime import datetime
 import discord
 
 from ORM.models.Birthday import Birthday
@@ -20,9 +23,11 @@ class BirthdayModal(discord.ui.Modal):
             year = int(self.children[2].value.strip())
 
             birthday_date = datetime(year, month, day).date()
-        except Exception:
+        except ValueError:
             await interaction.response.send_message(
-                "Invalid date entered. Make sure day is a number, month is full/short name, year is a number.",
+                "Invalid date entered."
+                "Make sure day is a number,"
+                "month is full/short name, year is a number.",
                 ephemeral=True,
             )
             return

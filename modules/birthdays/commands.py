@@ -1,8 +1,7 @@
 import discord
 from discord import SlashCommandGroup
-from datetime import datetime
 
-from ORM.models.User import Birthday
+from ORM.models.Birthday import Birthday
 from modules.birthdays.modals import BirthdayModal
 
 
@@ -21,7 +20,10 @@ class BirthdayCog(discord.Cog):
     async def get_birthday(self, ctx: discord.ApplicationContext):
         birthday = await Birthday.get(ctx.user.id)
         if birthday:
-            await ctx.respond(f"Your birthday is set to {birthday.date.strftime('%B %-d, %Y')}", ephemeral=True)
+            await ctx.respond(
+                f"Your birthday is set to {birthday.date.strftime('%B %-d, %Y')}",
+                ephemeral=True,
+            )
         else:
             await ctx.respond("You have not set a birthday yet.", ephemeral=True)
 
