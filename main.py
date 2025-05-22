@@ -1,5 +1,3 @@
-from attr.filters import exclude
-
 from controllers.database import execute
 from controllers.db_pool import db_pool
 from controllers.utility import Config
