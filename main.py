@@ -1,8 +1,10 @@
+from attr.filters import exclude
+
 from controllers.database import execute
 from controllers.db_pool import db_pool
 from controllers.utility import Config
 
-from discord import Intents, Status, Activity, ActivityType, Bot
+from discord import Intents, Status, Activity, ActivityType, Bot, NoEntryPointError
 
 from tasks import start_birthday_tasks
 
@@ -39,9 +41,11 @@ async def on_connect() -> None:
     );
     """
     )
-
-    bot.load_extensions("modules", recursive=True)
-
+    try:
+        bot.load_extensions("modules", recursive=True)
+    except NoEntryPointError as error:
+        print("[DEBUG] One or more files are missing entry points. Are these just init files?")
+        pass
 
 @bot.listen()
 async def on_reconnect() -> None:
