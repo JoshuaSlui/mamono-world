@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from ORM.models.User import User
+from ORM import User
 
 
 class CommandChecks(commands.Cog):

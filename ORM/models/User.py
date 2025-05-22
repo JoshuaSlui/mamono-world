@@ -1,4 +1,4 @@
-from ORM.models.baseORM import AsyncORMBase
+from . import AsyncORMBase
 
 
 class User(AsyncORMBase):
