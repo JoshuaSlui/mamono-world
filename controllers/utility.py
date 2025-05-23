@@ -29,8 +29,5 @@ class Config:
                     module_name = rel_path[:-3]  # remove ".py"
                     if file in exclude or module_name in exclude:
                         continue
-                    try:
-                        bot.load_extension(module_name)
-                        print(f"Loaded extension: {module_name}")
-                    except Exception as e:
-                        print(f"Failed to load {module_name}: {e}")
+                    bot.load_extension(module_name)
+                    print(f"Loaded extension: {module_name}")
