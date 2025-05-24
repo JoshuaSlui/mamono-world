@@ -16,6 +16,11 @@ class Level(AsyncORMBase):
         return int(100 * level ** 1.5)
 
     @staticmethod
+    def total_xp_for_level(level: int) -> int:
+        # Total XP required to reach a specific level
+        return sum(Level.xp_required(lvl) for lvl in range(1, level + 1))
+
+    @staticmethod
     def level_from_xp(xp: int) -> int:
         level = 1
         total_xp = 0
