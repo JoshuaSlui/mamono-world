@@ -26,6 +26,7 @@ class LevelingCog(discord.Cog):
 
         # Load fonts
         font_path = os.path.abspath(r"/home/joshua/PycharmProjects/mamono/bot/pythonProject/files/PressStart2P-Regular.ttf")
+        print(font_path)
         font_big = ImageFont.truetype(font_path, 30)   # Bigger for username
         font_small = ImageFont.truetype(font_path, 28)
         font_xp = ImageFont.truetype(font_path, 24)
