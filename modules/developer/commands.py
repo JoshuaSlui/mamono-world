@@ -17,7 +17,16 @@ class EvalModal(discord.ui.Modal):
             required=True,
             max_length=1000
         )
+        self.ephemeral = discord.ui.InputText(
+            label="Ephemeral Response",
+            style=discord.InputTextStyle.singleline,
+            placeholder="Should the response be ephemeral? (True, False)",
+            value="True",
+            required=False,
+            max_length=5
+        )
         self.add_item(self.code)
+        self.add_item(self.ephemeral)
 
     async def callback(self, interaction: discord.Interaction):
         code = self.children[0].value.strip()
@@ -42,7 +51,8 @@ class EvalModal(discord.ui.Modal):
         except Exception as e:
             result = f"Error:\n{e}"
 
-        await interaction.response.send_message(f"```py\n{result}\n```", ephemeral=True)
+        is_ephemeral = False if self.children[1].value.lower() == "false" else True
+        await interaction.response.send_message(f"```py\n{result}\n```", ephemeral=is_ephemeral)
 
 
 class EvalCog(discord.Cog):
