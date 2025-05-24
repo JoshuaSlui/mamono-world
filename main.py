@@ -1,6 +1,8 @@
+from ORM import Level
 from controllers.database import execute
 from controllers.db_pool import db_pool
 from controllers.utility import Config
+import random
 
 from discord import Intents, Status, Activity, ActivityType, Bot, NoEntryPointError
 
@@ -37,6 +39,15 @@ async def on_connect() -> None:
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
     );
+    
+    CREATE TABLE IF NOT EXISTS levels (
+        id BIGINT PRIMARY KEY,
+        level INT DEFAULT 0,
+        xp INT DEFAULT 0,
+        last_message TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    );
     """
     )
     config.load_extensions(bot, exclude=["modals.py", "utility.py"])
@@ -62,6 +73,25 @@ async def on_disconnect() -> None:
     print("Disconnecting from discord...")
     await db_pool.close_pool()
     await bot.close()
+
+@bot.listen()
+async def on_message(message):
+    if message.author.bot:
+        return
+
+    user_id = message.author.id
+    user = await Level.get_or_create(user_id)
+
+    if not await user.can_gain_xp(cooldown_seconds=60):
+        return  # 👀 Slow down, speedy demon
+
+    gained_xp = random.randint(10, 20)
+    leveled_up = await user.add_xp(gained_xp)
+
+    if leveled_up:
+        await message.channel.send(
+            f"🎉 {message.author.display_name} leveled up to **level {user.level}**! keep being a chatty lil bean uwu"
+        )
 
 
 config = Config()
