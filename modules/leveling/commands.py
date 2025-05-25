@@ -83,6 +83,59 @@ class LevelingCog(discord.Cog):
         buffer.seek(0)
         return discord.File(buffer, filename="shadow_rank_card.png")
 
+    @commands.command()
+    async def leaderboard(self, ctx):
+        # Fetch and sort top users
+        all_levels = await Level.all()
+        top_users = sorted(all_levels, key=lambda l: l.xp, reverse=True)[:10]
+
+        # Set up canvas
+        width, height = 800, 70 * len(top_users) + 80
+        image = Image.new("RGBA", (width, height), (13, 13, 13, 255))
+        draw = ImageDraw.Draw(image)
+
+        # Load fonts
+        try:
+            here = os.path.dirname(os.path.abspath(__file__))  # projectroot/modules/leveling
+            font_path = os.path.normpath(os.path.join(here, "..", "..", "files", "PressStart2P-Regular.ttf"))
+            font_title = ImageFont.truetype(font_path, 28)
+            font_name = ImageFont.truetype(font_path, 16)
+            font_entry = ImageFont.truetype(font_path, 20)
+        except:
+            font_title = ImageFont.load_default()
+            font_name = ImageFont.load_default()
+            font_entry = ImageFont.load_default()
+
+        # Draw title
+        draw.text((width // 2 - 150, 20), "🏆 Leaderboard", font=font_title, fill=(255, 255, 255))
+
+        # Loop through top users
+        y = 80
+        for idx, level in enumerate(top_users, start=1):
+            # if level.xp <= 0:
+            #     continue
+            try:
+                member = await self.bot.fetch_user(level.id)
+                avatar_asset = member.display_avatar.replace(static_format="png")
+                avatar_bytes = await avatar_asset.read()
+                avatar = Image.open(BytesIO(avatar_bytes)).resize((50, 50)).convert("RGBA")
+                avatar = ImageOps.expand(avatar, border=2, fill=(255, 0, 0))
+                image.paste(avatar, (40, y), avatar)
+
+                draw.text((110, y + 5), f"#{idx} {member.display_name}", font=font_name, fill=(255, 255, 255))
+                draw.text((500, y + 5), f"Lvl {level.level} - {level.xp} XP", font=font_entry, fill=(200, 200, 200))
+
+                y += 70
+            except Exception as e:
+                print(f"Error drawing user {level.id}: {e}")
+                continue
+
+        # Export to buffer
+        buffer = BytesIO()
+        image.save(buffer, "PNG")
+        buffer.seek(0)
+
+        await ctx.respond(file=discord.File(fp=buffer, filename="leaderboard.png"))
 
 
 def setup(bot: discord.Bot):
