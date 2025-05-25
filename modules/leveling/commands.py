@@ -112,8 +112,8 @@ class LevelingCog(discord.Cog):
         # Loop through top users
         y = 80
         for idx, level in enumerate(top_users, start=1):
-            # if level.xp <= 0:
-            #     continue
+            if level.xp <= 0:
+                continue
             try:
                 member = await self.bot.fetch_user(level.id)
                 avatar_asset = member.display_avatar.replace(static_format="png")
