@@ -16,7 +16,7 @@ class FunCog(discord.Cog):
 
         response = random.choice(responses)
 
-        await ctx.respond(f"**To the question:** {question}\n🎱 **Magic 8-Ball says:** {response}", ephemeral=True)
+        await ctx.respond(f"**To the question:** {question}\n🎱 **Magic 8-Ball says:** {response}")
 
 def setup(bot: discord.Bot):
     bot.add_cog(FunCog(bot))
