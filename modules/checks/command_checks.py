@@ -24,6 +24,16 @@ class CommandChecks(commands.Cog):
 
         return True
 
+    @commands.Cog.listener()
+    async def on_application_command_error(self, ctx: discord.ApplicationContext, error):
+        """Handle command errors globally."""
+        # This can be used to log errors or send a message to the user
+        if isinstance(error, commands.CheckFailure):
+            await ctx.respond(
+                "`[403]` **You do not have permission to use this command.**",
+                ephemeral=True,
+            )
+
 
 def setup(bot: discord.Bot):
     bot.add_cog(CommandChecks(bot))
