@@ -122,7 +122,9 @@ class LevelingCog(discord.Cog):
                 avatar = ImageOps.expand(avatar, border=2, fill=(255, 0, 0))
                 image.paste(avatar, (40, y), avatar)
 
-                draw.text((110, y + 5), f"#{idx} {member.display_name}", font=font_name, fill=(255, 255, 255))
+                max_name_width = 250      # adjust to your layout, so it fits nicely
+                truncated_name = self.truncate_text(draw, member.display_name, font_entry, max_name_width)
+                draw.text((110, y + 5), f"#{idx} {truncated_name}", font=font_entry, fill=(255, 255, 255))
                 draw.text((500, y + 5), f"Lvl {level.level} - {level.xp} XP", font=font_entry, fill=(200, 200, 200))
 
                 y += 70
@@ -136,6 +138,15 @@ class LevelingCog(discord.Cog):
         buffer.seek(0)
 
         await ctx.respond(file=discord.File(fp=buffer, filename="leaderboard.png"))
+
+    def truncate_text(self, draw, text, font, max_width):
+        ellipsis = "..."
+        if draw.textlength(text, font=font) <= max_width:
+            return text
+        else:
+            while draw.textlength(text + ellipsis, font=font) > max_width and len(text) > 0:
+                text = text[:-1]
+            return text + ellipsis
 
 
 def setup(bot: discord.Bot):
