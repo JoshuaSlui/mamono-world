@@ -10,7 +10,9 @@ class LevelingCog(discord.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    level = commands.SlashCommandGroup("level", "Leveling commands")
+
+    @level.command()
     async def rank(self, ctx):
         user_id = ctx.author.id
         level_data = await Level.get_or_create(user_id)
@@ -83,7 +85,7 @@ class LevelingCog(discord.Cog):
         buffer.seek(0)
         return discord.File(buffer, filename="shadow_rank_card.png")
 
-    @commands.command()
+    @level.command()
     async def leaderboard(self, ctx):
         # Fetch and sort top users
         all_levels = await Level.all()
