@@ -53,7 +53,7 @@ async def on_connect() -> None:
     );
     """
     )
-    config.load_extensions(bot, exclude=["modals.py", "utility.py"])
+    config.load_extensions(bot, exclude=["modals.py", "utility.py", "cards.py"])
 
 @bot.listen()
 async def on_reconnect() -> None:
