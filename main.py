@@ -1,3 +1,5 @@
+import discord
+
 from ORM import Level
 from controllers.database import execute
 from controllers.db_pool import db_pool
@@ -9,12 +11,13 @@ from discord import Intents, Status, Activity, ActivityType, Bot, NoEntryPointEr
 from tasks import start_birthday_tasks
 
 intents = Intents(messages=True, guilds=True, members=True, message_content=True)
+config = Config()
 
 bot = Bot(
     intents=intents,
     status=Status.online,
     activity=Activity(type=ActivityType.streaming, name="Starting..."),
-    debug_guilds=[1189254335129976862],
+    debug_guilds=[config.get("guild_id")],  # Replace with your debug guild ID
 )
 
 
@@ -93,6 +96,20 @@ async def on_message(message):
             f"🎉 {message.author.display_name} leveled up to **level {user.level}**! keep being a chatty lil bean uwu"
         )
 
+@bot.listen()
+async def on_member_join(member):
+    embed = discord.Embed()
+    embed.set_author(
+        name="- Mamono Management",
+        icon_url="https://cdn.discordapp.com/attachments/1369382913241649313/1371960397598294036/shadesilly.png?ex=68343270&is=6832e0f0&hm=1c376876f6f530116c5d1628de1a417c9b304ae2fcf159f172cc232333af18bd&"
+    )
+    embed.title = f"Welcome {member.display_name}!"
+    embed.description = """
+        Welcome to Mamono World! Please verify in <id:customize>!
+        Afterwards, please introduce yourself and feel free to enjoy our community!!!!
+    """
+    embed.set_thumbnail(url=member.display_avatar.url)
+    channel = bot.get_channel(config.get("joins_channel"))
+    await channel.send(embed=embed)
 
-config = Config()
 bot.run(config.get("bot_token"))
