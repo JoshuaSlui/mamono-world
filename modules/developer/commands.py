@@ -59,8 +59,10 @@ class EvalCog(discord.Cog):
     def __init__(self, bot: discord.Bot):
         self.bot = bot
 
+    developer = commands.SlashCommandGroup("developer", "Developer commands")
+
     @ext_commands.is_owner()
-    @commands.command(name="eval", description="Run dynamic python code")
+    @developer.command(name="eval", description="Run dynamic python code")
     async def eval(self, ctx: discord.ApplicationContext):
         setup_logger().info(f"Eval command used by {ctx.user.name} ({ctx.user.id})")
         modal = EvalModal()

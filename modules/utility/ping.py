@@ -1,12 +1,14 @@
 import discord
-from discord import slash_command, Embed
+from discord import commands, Embed
 
 
 class Info(discord.Cog):
     def __init__(self, bot: discord.Bot):
         self.bot = bot
 
-    @slash_command()
+    utility = discord.SlashCommandGroup("utility", "Utility commands")
+
+    @utility.command()
     async def info(self, ctx):
         embed = Embed()
         embed.colour = discord.Color.blurple()
