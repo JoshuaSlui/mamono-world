@@ -109,6 +109,7 @@ async def on_member_join(member):
         Afterwards, please introduce yourself and feel free to enjoy our community!!!!
     """
     embed.set_thumbnail(url=member.display_avatar.url)
+    embed.colour = discord.Colour.purple()
     channel = bot.get_channel(config.get("joins_channel"))
     await channel.send(embed=embed)
 
