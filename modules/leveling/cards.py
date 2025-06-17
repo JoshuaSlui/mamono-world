@@ -96,7 +96,7 @@ async def generate_leaderboard_card(self, top_users):
             max_name_width = 250  # adjust to your layout, so it fits nicely
             truncated_name = self.truncate_text(draw, member.display_name, font_entry, max_name_width)
             draw.text((110, y + 5), f"#{idx} {truncated_name}", font=font_entry, fill=(255, 255, 255))
-            draw.text((500, y + 5), f"Lvl {level.level} - {level.xp} XP", font=font_entry, fill=(200, 200, 200))
+            draw.text((500, y + 5), f"Lvl {level.level}", font=font_entry, fill=(200, 200, 200))
 
             y += 70
         except Exception as e:
