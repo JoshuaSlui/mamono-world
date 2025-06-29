@@ -28,12 +28,14 @@ async def birthday_check_loop(channel: discord.TextChannel, guild: discord.Guild
         try:
             is_birthday = await check_user_birthday(user)
             if is_birthday:
-                user = guild.get_member(user.id)
+                member = guild.get_member(user.id)
+                if not member:
+                    continue
                 embed = discord.Embed()
                 embed.title = "🎉 Happy Birthday!"
-                embed.description = f"Happy birthday to {user.display_name}!"
-                embed.set_thumbnail(url=user.avatar.url)
-                await channel.send(f"{user.mention}", embed=embed)
+                embed.description = f"Happy birthday to {member.display_name}!"
+                embed.set_thumbnail(url=member.avatar.url)
+                await channel.send(f"{member.mention}", embed=embed)
 
         except Exception as e:
             print(f"⚠️ Error checking user {user.id}: {e}")
