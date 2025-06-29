@@ -1,6 +1,6 @@
 import discord
 
-from ORM import Level
+from ORM import Level, Guild
 from controllers.database import execute
 from controllers.db_pool import db_pool
 from controllers.utility import Config
@@ -56,6 +56,14 @@ async def on_connect() -> None:
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     );
+    
+    CREATE TABLE IF NOT EXISTS guilds (
+    id BIGINT PRIMARY KEY,
+    owner_id BIGINT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE)
     """
     )
     config.load_extensions(bot, exclude=["modals.py", "utility.py", "cards.py"])
@@ -97,6 +105,11 @@ async def on_message(message):
     leveled_up = await user.add_xp(gained_xp)
 
     if leveled_up:
+        if user.level >= 2 and not any(role.id == config.get("level_verification") for role in message.author.roles):
+            guild = message.guild
+            role = guild.get_role(config.get("level_verification"))
+            await message.author.add_roles(role)
+
         await message.channel.send(
             f"🎉 {message.author.display_name} leveled up to **level {user.level}**! keep being a chatty lil bean uwu"
         )
@@ -117,5 +130,10 @@ async def on_member_join(member):
     embed.colour = discord.Colour.purple()
     channel = bot.get_channel(config.get("joins_channel"))
     await channel.send(embed=embed)
+
+@bot.listen()
+async def on_guild_join(guild: discord.Guild):
+    await Guild.create_or_update(guild)
+    print(f"Joined guild: {guild.name} (ID: {guild.id})")
 
 bot.run(config.get("bot_token"))
