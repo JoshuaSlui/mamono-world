@@ -21,7 +21,7 @@ bot = Bot(
     allowed_mentions=discord.AllowedMentions(
         everyone=False,  # Disable @everyone mentions
         users=True,  # Enable @user mentions
-        roles=False,  # Disable @role mentions
+        roles=True,  # Disable @role mentions
     )
 )
 
@@ -102,7 +102,7 @@ async def on_message(message):
         return  # 👀 Slow down, speedy demon
 
     gained_xp = random.randint(10, 20)
-    leveled_up = await user.add_xp(gained_xp)
+    leveled_up = await user.add_xp(gained_xp)   
 
     if leveled_up:
         if user.level >= 2 and not any(role.id == config.get("level_verification") for role in message.author.roles):

@@ -1,5 +1,6 @@
 import discord
 from discord import commands, Embed
+from discord.ext import commands as ext_commands
 
 
 class Info(discord.Cog):
@@ -17,6 +18,10 @@ class Info(discord.Cog):
 """
         await ctx.respond(embed=embed)
 
+    @ext_commands.has_role(1381328751845179522)
+    @utility.command()
+    async def event(self, ctx: discord.ApplicationContext):
+        await ctx.respond("<@&1391031210343399454>")
 
 def setup(bot: discord.Bot):
     bot.add_cog(Info(bot))
