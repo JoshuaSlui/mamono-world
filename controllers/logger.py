@@ -1,5 +1,4 @@
 import logging
-from .utility import Config
 
 # Define ANSI color codes
 COLOR_CODES = {
@@ -22,6 +21,7 @@ class ColoredFormatter(logging.Formatter):
 
 
 def setup_logger():
+    from .utility import Config
     logger = logging.getLogger()
 
     # Determine the logging level based on settings

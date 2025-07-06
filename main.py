@@ -1,12 +1,11 @@
 import discord
 
 from ORM import Level, Guild
-from controllers.database import execute
 from controllers.db_pool import db_pool
 from controllers.utility import Config
 import random
 
-from discord import Intents, Status, Activity, ActivityType, Bot, NoEntryPointError
+from discord import Intents, Status, Activity, ActivityType, Bot
 
 from tasks import start_birthday_tasks
 
@@ -30,42 +29,6 @@ bot = Bot(
 async def on_connect() -> None:
     print("Connecting to discord...")
     await db_pool.init_pool()
-    await execute(
-        """
-    CREATE TABLE IF NOT EXISTS users (
-        id BIGINT PRIMARY KEY,
-        is_superuser BOOLEAN DEFAULT FALSE,
-        is_active BOOLEAN DEFAULT TRUE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS birthdays (
-        id BIGINT PRIMARY KEY,
-        date DATE NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
-    );
-    
-    CREATE TABLE IF NOT EXISTS levels (
-        id BIGINT PRIMARY KEY,
-        level INT DEFAULT 0,
-        xp INT DEFAULT 0,
-        last_message TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE IF NOT EXISTS guilds (
-    id BIGINT PRIMARY KEY,
-    owner_id BIGINT NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    is_active BOOLEAN DEFAULT TRUE)
-    """
-    )
     config.load_extensions(bot, exclude=["modals.py", "utility.py", "cards.py"])
 
 @bot.listen()

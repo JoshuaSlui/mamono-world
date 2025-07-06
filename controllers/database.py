@@ -40,3 +40,4 @@ async def execute(statement: str, args: [] = None):
             )
         )
         return aiomysql.Error
+
