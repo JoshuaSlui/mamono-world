@@ -15,7 +15,7 @@ class LevelingCog(discord.Cog):
     @level.command()
     async def rank(self, ctx):
         user_id = ctx.author.id
-        level_data = await Level.get_or_create(user_id)
+        level_data, _ = await Level.objects.get_or_create(user=user_id, guild=ctx.guild.id)
 
         card = await generate_rank_card(ctx.author, level_data)
         await ctx.respond(file=card)
@@ -23,7 +23,8 @@ class LevelingCog(discord.Cog):
     @level.command()
     async def leaderboard(self, ctx):
         # Fetch and sort top users
-        all_levels = await Level.all()
+        all_levels = await Level.objects.filter(guild=ctx.guild.id)
+
         top_users = sorted(all_levels, key=lambda l: l.xp, reverse=True)[:10]
 
         # Set up canvas
