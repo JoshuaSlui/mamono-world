@@ -1,4 +1,5 @@
 import warnings
+from typing import Optional
 
 import aiomysql
 import pymysql
@@ -6,7 +7,7 @@ import pymysql
 from controllers.db_pool import db_pool
 
 
-async def execute(statement: str, args: [] = None):
+async def execute(statement: str, args: Optional[list] = None):
     pool = db_pool.get_pool()
 
     if pool is None:
