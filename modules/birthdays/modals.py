@@ -34,7 +34,8 @@ class BirthdayModal(discord.ui.Modal):
 
         birthday = Birthday()
         birthday.date = birthday_date
-        birthday.id = interaction.user.id
+        birthday.user = interaction.user.id
+        birthday.guild = interaction.guild.id
         await birthday.save()
 
         await interaction.response.send_message(
