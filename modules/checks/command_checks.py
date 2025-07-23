@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 from ORM import User
+from main import config
 
 
 class CommandChecks(commands.Cog):
@@ -14,7 +15,7 @@ class CommandChecks(commands.Cog):
 
     async def global_check(self, ctx: discord.ApplicationContext):
         """Check if the user is active."""
-        user = await User.get_or_create(ctx.user.id)
+        user, _ = await User.objects.get_or_create(id=ctx.user.id)
 
         if not user.is_active:
             await ctx.respond(
@@ -33,6 +34,18 @@ class CommandChecks(commands.Cog):
                 "`[403]` **You do not have permission to use this command.**",
                 ephemeral=True,
             )
+        else:
+            if config.get('debug'):
+                await ctx.respond(
+                    f"`[500]` **An error occurred: {error.__class__.__name__}**\n{error}",
+                    ephemeral=True,
+                )
+            else:
+                await ctx.respond(
+                    "`[500]` **An error occurred while processing your request.**",
+                    ephemeral=True,
+                )
+                raise error
 
 
 def setup(bot: discord.Bot):
