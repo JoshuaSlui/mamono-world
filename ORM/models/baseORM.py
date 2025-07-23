@@ -1,40 +1,77 @@
+from typing import TypeVar, Generic, Type, List, Optional, Any, Tuple
 from controllers.database import execute
 
+T = TypeVar("T", bound="AsyncORMBase")
+
+class QuerySet(Generic[T]):
+    def __init__(self, model_cls: Type[T]):
+        self.model_cls = model_cls
+        self._filters: List[str] = []
+        self._params: List[Any] = []
+
+    def filter(self: "QuerySet[T]", **kwargs: Any) -> "QuerySet[T]":
+        for key, value in kwargs.items():
+            self._filters.append(f"{key} = %s")
+            self._params.append(value)
+            print(self)
+        return self
+
+    def __await__(self):
+        # This makes it so you can `await User.objects.filter(...)`
+        return self.all().__await__()
+
+    async def all(self) -> List[T]:
+        query = f"SELECT * FROM {self.model_cls.table_name}"
+        if self._filters:
+            query += " WHERE " + " AND ".join(self._filters)
+        rows = await execute(query, self._params)
+        return [self.model_cls(**row) for row in rows]
+
+    async def get(self, **kwargs: Any) -> Optional[T]:
+        self.filter(**kwargs)
+        results = await self.all()
+        if not results:
+            return None
+        if len(results) > 1:
+            raise Exception("Multiple objects returned from get()")
+        return results[0]
+
+    async def get_or_create(self, **kwargs: Any) -> Tuple[T, bool]:
+        instance = await self.get(**kwargs)
+        if instance:
+            return instance, False
+
+        columns = list(kwargs.keys())
+        values = list(kwargs.values())
+
+        col_str = ", ".join(columns)
+        placeholders = ", ".join(["%s"] * len(values))
+
+        query = f"""
+            INSERT INTO {self.model_cls.table_name} ({col_str})
+            VALUES ({placeholders})
+            ON DUPLICATE KEY UPDATE {self.model_cls.pk_field} = {self.model_cls.pk_field}
+        """
+
+        await execute(query, values)
+        instance = await self.get(**kwargs)
+        return instance, True
+
+class Manager(Generic[T]):
+    def __get__(self, instance, owner) -> "QuerySet[T]":
+        return QuerySet(owner)
 
 class AsyncORMBase:
-    table_name = ""
-    pk_field = "id"
+    table_name: str = ""
+    pk_field: str = "id"
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
 
-    @classmethod
-    async def all(cls):
-        query = f"SELECT * FROM {cls.table_name}"
-        rows = await execute(query)
-        return [cls(**row) for row in rows]
+    objects = Manager()
 
-    @classmethod
-    async def get(cls, pk):
-        query = f"SELECT * FROM {cls.table_name} WHERE {cls.pk_field} = %s"
-        rows = await execute(query, [pk])
-        if not rows:
-            return None
-        return cls(**rows[0])
-
-    @classmethod
-    async def get_or_create(cls, pk):
-        instance = await cls.get(pk)
-        if instance:
-            return instance
-        await execute(
-            f"INSERT INTO {cls.table_name} ({cls.pk_field}) VALUES (%s) ON DUPLICATE KEY UPDATE {cls.pk_field}={cls.pk_field}",
-            [pk],
-        )
-        return await cls.get(pk)
-
-    async def save(self):
+    async def save(self) -> None:
         columns = [k for k in self.__dict__.keys() if not k.startswith("_")]
         values = [getattr(self, col) for col in columns]
 
@@ -52,7 +89,7 @@ class AsyncORMBase:
         """
         await execute(query, values)
 
-    async def delete(self):
+    async def delete(self) -> bool:
         await execute(
             f"DELETE FROM {self.table_name} WHERE {self.pk_field} = %s",
             [getattr(self, self.pk_field)],
