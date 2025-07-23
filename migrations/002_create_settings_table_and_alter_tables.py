@@ -30,7 +30,7 @@ async def upgrade():
             
         UPDATE birthdays SET birthdays.guild = %s WHERE guild IS NULL;
         UPDATE levels SET levels.guild = %s WHERE guild IS NULL;
-    """, [config.get("guild_id"), config.get("guild_id")])
+    """, [config.get("guild_id")[0], config.get("guild_id")[0]])
 
 async def downgrade():
     await execute("""
