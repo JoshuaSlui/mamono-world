@@ -16,7 +16,7 @@ bot = Bot(
     intents=intents,
     status=Status.online,
     activity=Activity(type=ActivityType.streaming, name="Starting..."),
-    debug_guilds=[config.get("guild_id")],  # Replace with your debug guild ID
+    debug_guilds=config.get("guild_id"),  # Replace with your debug guild ID
     allowed_mentions=discord.AllowedMentions(
         everyone=False,  # Disable @everyone mentions
         users=True,  # Enable @user mentions
@@ -59,7 +59,7 @@ async def on_message(message):
         return
 
     user_id = message.author.id
-    user = await Level.get_or_create(user_id)
+    user, _ = await Level.objects.get_or_create(user=user_id, guild=message.guild.id)
 
     if not await user.can_gain_xp(cooldown_seconds=60):
         return  # 👀 Slow down, speedy demon
@@ -99,4 +99,5 @@ async def on_guild_join(guild: discord.Guild):
     await Guild.create_or_update(guild)
     print(f"Joined guild: {guild.name} (ID: {guild.id})")
 
-bot.run(config.get("bot_token"))
+if __name__ == "__main__":
+    bot.run(config.get("bot_token"))
