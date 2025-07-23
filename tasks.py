@@ -9,7 +9,7 @@ from ORM.models.User import User
 from controllers.utility import Config
 from modules.checks.utility import check_user_birthday
 
-
+# TODO: Make birthdays compatible with public guilds
 async def wait_until_midnight_est():
     now = datetime.now(ZoneInfo("America/New_York"))
     tomorrow = (now + timedelta(days=1)).replace(
