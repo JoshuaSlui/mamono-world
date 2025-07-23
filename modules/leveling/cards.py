@@ -86,7 +86,7 @@ async def generate_leaderboard_card(self, top_users):
         if level.xp <= 0:
             continue
         try:
-            member = await self.bot.fetch_user(level.id)
+            member = await self.bot.fetch_user(level.user)
             avatar_asset = member.display_avatar.replace(static_format="png")
             avatar_bytes = await avatar_asset.read()
             avatar = Image.open(BytesIO(avatar_bytes)).resize((50, 50)).convert("RGBA")
