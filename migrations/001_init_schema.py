@@ -1,4 +1,6 @@
 from controllers.database import execute
+from main import config
+
 
 async def upgrade():
     await execute("""
@@ -16,8 +18,7 @@ async def upgrade():
             id BIGINT PRIMARY KEY,
             date DATE NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         );
     """)
 
@@ -41,7 +42,12 @@ async def upgrade():
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             is_active BOOLEAN DEFAULT TRUE
         );
-    """)
+            
+        INSERT INTO guilds (id, owner_id, name) VALUES (%s, %s, 'Initial server') ON DUPLICATE KEY UPDATE id = id;
+    """, [
+        config.get('guild_id')[0],  # Replace with your actual guild ID
+        1 # You can change this with the eval command later
+    ])
 
 
 async def downgrade():
