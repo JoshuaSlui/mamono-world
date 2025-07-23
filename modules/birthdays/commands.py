@@ -18,7 +18,7 @@ class BirthdayCog(discord.Cog):
 
     @birthday.command(name="get", description="Get your birthday")
     async def get_birthday(self, ctx: discord.ApplicationContext):
-        birthday = await Birthday.get(ctx.user.id)
+        birthday = await Birthday.objects.filter(guild=ctx.guild.id).get(user=ctx.user.id)
         if birthday:
             await ctx.respond(
                 f"Your birthday is set to {birthday.date.strftime('%B %-d, %Y')}",
@@ -29,7 +29,7 @@ class BirthdayCog(discord.Cog):
 
     @birthday.command(name="delete", description="Delete your birthday")
     async def delete_birthday(self, ctx: discord.ApplicationContext):
-        birthday = await Birthday.get(ctx.user.id)
+        birthday = await Birthday.objects.filter(guild=ctx.guild.id).get(user=ctx.user.id)
         if birthday:
             await birthday.delete()
             await ctx.respond("Your birthday has been deleted.", ephemeral=True)
