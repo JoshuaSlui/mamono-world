@@ -16,7 +16,7 @@ bot = Bot(
     intents=intents,
     status=Status.online,
     activity=Activity(type=ActivityType.streaming, name="Starting..."),
-    debug_guilds=config.get("guild_id"),  # Replace with your debug guild ID
+    debug_guilds=config.get("guild_id") if config.get("debug") else None,  # Replace with your debug guild ID
     allowed_mentions=discord.AllowedMentions(
         everyone=False,  # Disable @everyone mentions
         users=True,  # Enable @user mentions
