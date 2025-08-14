@@ -12,41 +12,44 @@ class SettingsManager:
     def __init__(self, model_cls, schema_enum):
         self.model_cls = model_cls
         self.schema = schema_enum  # e.g., SettingKey
+        self._cache = {}  # {scope_type: {scope_id: {setting_key: value}}}
 
     SCOPES_GLOBAL = Scopes.GLOBAL
     SCOPES_GUILD = Scopes.GUILD
     SCOPES_USER = Scopes.USER
 
-    async def get(self, scope_type: str, scope_id: int, setting_key: SettingKey) -> Any:
+    async def get(self, scope_type: Scopes, scope_id: int, setting_key: SettingKey) -> Any:
+        # --- check cache ---
+        scope_cache = self._cache.setdefault(scope_type, {})
+        id_cache = scope_cache.setdefault(scope_id, {})
+        if setting_key.name in id_cache:
+            return id_cache[setting_key.name]
+
+        # --- fetch from DB ---
         key_name = setting_key.name.lower()
         setting = await self.model_cls.objects.get(
-            scope_type=scope_type,
+            scope_type=scope_type.value,
             scope_id=scope_id,
             setting_key=key_name
         )
         if setting is None:
-            default_value = setting_key.value.default
-            await self.set(scope_type, scope_id, setting_key, default_value)
-            return default_value
+            value = setting_key.value.default
+        else:
+            value = self._deserialize(setting.value, setting_key.value.value_type)
 
-        # Deserialize and type-check
-        raw_value = setting.value
-        value = self._deserialize(raw_value, setting_key.value.value_type)
+        # --- store in cache ---
+        id_cache[setting_key.name] = value
         return value
 
-    async def set(self, scope_type: str, scope_id: int, setting_key: SettingKey, value: Any) -> None:
+    async def set(self, scope_type: Scopes, scope_id: int, setting_key: SettingKey, value: Any) -> None:
         if not isinstance(value, setting_key.value.value_type):
             raise TypeError(f"Expected value of type {setting_key.value.value_type} for {setting_key.name}")
-        if not isinstance(scope_type, Scopes):
-            raise ValueError(f"Invalid scope type: {scope_type}. Must be one of {list(Scopes)}")
 
         key_name = setting_key.name.lower()
         value_str = self._serialize(value)
 
-        print(self.model_cls.objects, self.model_cls)
-
         setting = await self.model_cls.objects.get(
-            scope_type=scope_type,
+            scope_type=scope_type.value,
             scope_id=scope_id,
             setting_key=key_name
         )
@@ -61,6 +64,15 @@ class SettingsManager:
             setting.value = value_str
 
         await setting.save()
+
+        # --- update cache ---
+        scope_cache = self._cache.setdefault(scope_type, {})
+        id_cache = scope_cache.setdefault(scope_id, {})
+        id_cache[setting_key.name] = value
+
+    async def invalidate_cache(self, scope_type: Scopes, scope_id: int):
+        if scope_type in self._cache:
+            self._cache[scope_type].pop(scope_id, None)
 
     def _serialize(self, value: Any) -> str:
         import json
