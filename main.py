@@ -9,6 +9,7 @@ from discord import Intents, Status, Activity, ActivityType, Bot
 
 from managers import settings, SettingsManager
 from managers.settings.guild_settings import SettingKey
+from modules.leveling.utils import process_leveling_for_message
 from tasks import start_birthday_tasks
 
 intents = Intents(messages=True, guilds=True, members=True, message_content=True)
@@ -60,27 +61,13 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    leveling_enabled: bool = await settings.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=message.guild.id, setting_key=SettingKey.LEVEL_UP_ENABLED)
-    if not leveling_enabled:
+    leveled_up, level = await process_leveling_for_message(message)
+
+    if not leveled_up:
         return
 
-    user_id = message.author.id
-    user, _ = await Level.objects.get_or_create(user=user_id, guild=message.guild.id)
-    leveling_message: str = await settings.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=message.guild.id, setting_key=SettingKey.LEVEL_UP_MESSAGE)
-
-    if not await user.can_gain_xp(cooldown_seconds=60):
-        return  # 👀 Slow down, speedy demon
-
-    gained_xp = random.randint(10, 20)
-    leveled_up = await user.add_xp(gained_xp)   
-
-    if leveled_up:
-        if user.level >= 2 and not any(role.id == config.get("level_verification") for role in message.author.roles):
-            guild = message.guild
-            role = guild.get_role(config.get("level_verification"))
-            await message.author.add_roles(role)
-
-        await message.channel.send(leveling_message)
+    leveling_message = await settings.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=message.guild.id, setting_key=SettingKey.LEVEL_UP_MESSAGE)
+    await message.channel.send(leveling_message.format(user=message.author, level=level))
 
 @bot.listen()
 async def on_member_join(member):
