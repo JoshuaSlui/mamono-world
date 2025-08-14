@@ -29,7 +29,7 @@ bot = Bot(
 async def on_connect() -> None:
     print("Connecting to discord...")
     await db_pool.init_pool()
-    config.load_extensions(bot, exclude=["modals.py", "utility.py", "cards.py"])
+    config.load_extensions(bot)
 
 @bot.listen()
 async def on_reconnect() -> None:
