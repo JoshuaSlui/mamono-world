@@ -3,12 +3,20 @@ import os
 import discord
 from discord import commands
 from ORM import Level  # Your existing Level model
+from managers import settings_manager, SettingsManager
+from managers.settings.guild_settings import SettingKey
 from modules.leveling.cards import generate_rank_card, generate_leaderboard_card
 
 
 class LevelingCog(discord.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.__cog_name__ = "Leveling"
+
+    async def cog_check(self, ctx):
+        """Ensure the module is enabled."""
+        is_module_enabled = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=ctx.guild.id, setting_key=SettingKey.LEVEL_UP_ENABLED)
+        return is_module_enabled
 
     level = commands.SlashCommandGroup("level", "Leveling commands")
 
