@@ -41,7 +41,10 @@ class SettingsManager:
         id_cache[setting_key.name] = value
         return value
 
-    async def set(self, scope_type: Scopes, scope_id: int, setting_key: SettingKey, value: Any) -> None:
+    async def set(self, scope_type: Scopes, scope_id: int, setting_key: SettingKey, value: Any = None) -> None:
+        if value is None:
+            value = setting_key.value.default
+
         if not isinstance(value, setting_key.value.value_type):
             raise TypeError(f"Expected value of type {setting_key.value.value_type} for {setting_key.name}")
 

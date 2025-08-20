@@ -1,4 +1,5 @@
 import random
+import discord
 import re
 from typing import Tuple, Any
 
@@ -30,21 +31,28 @@ async def process_leveling_for_message(message) -> Tuple[bool, str | None]:
     return True, user.level
 
 # Build regex dynamically from the whitelist
-PARAM_PATTERN = re.compile(r"{user\.(" + "|".join(map(re.escape, settings.ALLOWED_USER_PARAMS)) + r")}")
-
-async def message_params_processor(message: str, user: Any) -> str:
+USER_PARAM_PATTERN = re.compile(r"{user\.(" + "|".join(map(re.escape, settings.ALLOWED_USER_PARAMS)) + r")}")
+GUILD_PARAM_PATTERN = re.compile(r"{guild\.(" + "|".join(map(re.escape, settings.ALLOWED_GUILD_PARAMS)) + r")}")
+async def message_params_processor(message: str, user: discord.User = None, guild: discord.Guild = None) -> str:
     """
     Replaces whitelisted placeholders for a user object in the message string.
 
     Supported placeholders:
-      {user.mention}
-      {user.name}
-      {user.display_name}
-      {user.id}
+    {user.mention}
+    {user.name}
+    {user.display_name}
+    {user.id}
+    {guild.name}
+    {guild.id}
     """
     def replace_match(match: re.Match) -> str:
         attr = match.group(1)
         value = getattr(user, attr, None)
+        if value is None and guild is not None:
+            value = getattr(guild, attr, None)
         return str(value) if value is not None else match.group(0)
 
-    return PARAM_PATTERN.sub(replace_match, message)
+    user_parsed = USER_PARAM_PATTERN.sub(replace_match, message)
+    guild_parsed = GUILD_PARAM_PATTERN.sub(replace_match, user_parsed)
+
+    return guild_parsed
