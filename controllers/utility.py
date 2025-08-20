@@ -22,7 +22,7 @@ class Config:
     def load_extensions(bot: discord.Bot, base_folder="modules"):
         for root, _, files in os.walk(base_folder):
             for file in files:
-                if file == "commands.py":
+                if file == "commands.py" or file == "command_checks.py":
                     rel_path = os.path.relpath(os.path.join(root, file), ".").replace(os.sep, ".")
                     module_name = rel_path[:-3]  # remove ".py"
                     bot.load_extension(module_name)
