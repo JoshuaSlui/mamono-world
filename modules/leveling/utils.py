@@ -27,11 +27,6 @@ async def process_leveling_for_message(message) -> Tuple[bool, str | None]:
     if not leveled_up:
         return False, None
 
-    if user.level >= 2 and not any(role.id == config.get("level_verification") for role in message.author.roles):
-        guild = message.guild
-        role = guild.get_role(config.get("level_verification"))
-        await message.author.add_roles(role)
-
     return True, user.level
 
 # Build regex dynamically from the whitelist
