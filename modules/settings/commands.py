@@ -28,12 +28,5 @@ class SettingsCog(discord.Cog):
         parsed_message = await message_params_processor(message, user=ctx.author)
         await ctx.respond(f"Level-up message updated to:\n\n{message}\n\nExample: {parsed_message}")
 
-    @birthday.command()
-    @ext_commands.has_guild_permissions(manage_guild=True)
-    @discord.option("enabled", bool, description="Enable or disable birthday reminders")
-    async def toggle(self, ctx: discord.ApplicationContext, enabled):
-        await settings_manager.set(scope_type=SettingsManager.SCOPES_GUILD, scope_id=ctx.guild_id, setting_key=SettingKey.BIRTHDAY_REMINDERS_ENABLED, value=enabled)
-        await ctx.respond(f"Birthday reminders have been {'enabled' if enabled else 'disabled'}!")
-
 def setup(bot: discord.Bot):
     bot.add_cog(SettingsCog(bot))
