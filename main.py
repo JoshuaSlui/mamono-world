@@ -7,10 +7,10 @@ import random
 
 from discord import Intents, Status, Activity, ActivityType, Bot
 
-from managers import settings, SettingsManager
+from managers import settings_manager, SettingsManager
 from managers.settings.guild_settings import SettingKey
 from modules.leveling.utils import process_leveling_for_message
-from tasks import start_birthday_tasks
+
 
 intents = Intents(messages=True, guilds=True, members=True, message_content=True)
 config = Config()
@@ -47,7 +47,7 @@ async def on_ready() -> None:
         activity=Activity(type=ActivityType.streaming, name="Watching Mamono")
     )
     print(f'Authenticated with modules:\n{"\n".join(bot.extensions).replace('.', '/')}')
-    await start_birthday_tasks(bot)
+    # await start_birthday_tasks(bot)
 
 
 @bot.listen()
@@ -66,7 +66,7 @@ async def on_message(message):
     if not leveled_up:
         return
 
-    leveling_message = await settings.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=message.guild.id, setting_key=SettingKey.LEVEL_UP_MESSAGE)
+    leveling_message = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=message.guild.id, setting_key=SettingKey.LEVEL_UP_MESSAGE)
     await message.channel.send(leveling_message.format(user=message.author, level=level))
 
 @bot.listen()
