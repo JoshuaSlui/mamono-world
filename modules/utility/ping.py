@@ -1,5 +1,4 @@
 import discord
-from discord import commands, Embed
 from discord.ext import commands as ext_commands
 
 
@@ -11,7 +10,7 @@ class Info(discord.Cog):
 
     @utility.command()
     async def info(self, ctx):
-        embed = Embed()
+        embed = discord.Embed()
         embed.colour = discord.Color.blurple()
         embed.description = f"""
 **API Latency:** {round(self.bot.latency * 1000)}ms
@@ -22,6 +21,7 @@ class Info(discord.Cog):
     @utility.command()
     async def event(self, ctx: discord.ApplicationContext):
         await ctx.respond("<@&1391031210343399454>")
+
 
 def setup(bot: discord.Bot):
     bot.add_cog(Info(bot))

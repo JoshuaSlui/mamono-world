@@ -1,6 +1,7 @@
 from datetime import datetime
 from ORM.models import AsyncORMBase
 
+
 class Level(AsyncORMBase):
     table_name = "levels"
     pk_field = "id"

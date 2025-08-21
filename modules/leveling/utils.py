@@ -11,6 +11,7 @@ from controllers.utility import Config
 
 config = Config()
 
+
 async def process_leveling_for_message(message) -> Tuple[bool, str | None]:
     leveling_enabled = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=message.guild.id, setting_key=SettingKey.LEVEL_UP_ENABLED)
     if not leveling_enabled:
@@ -33,7 +34,9 @@ async def process_leveling_for_message(message) -> Tuple[bool, str | None]:
 # Build regex dynamically from the whitelist
 USER_PARAM_PATTERN = re.compile(r"{user\.(" + "|".join(map(re.escape, settings.ALLOWED_USER_PARAMS)) + r")}")
 GUILD_PARAM_PATTERN = re.compile(r"{guild\.(" + "|".join(map(re.escape, settings.ALLOWED_GUILD_PARAMS)) + r")}")
-async def message_params_processor(message: str, user: discord.User = None, guild: discord.Guild = None) -> str:
+
+
+def message_params_processor(message: str, user: discord.User = None, guild: discord.Guild = None) -> str:
     """
     Replaces whitelisted placeholders for a user object in the message string.
 

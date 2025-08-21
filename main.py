@@ -1,16 +1,12 @@
 import discord
-
-from ORM import Level, Guild
-from controllers.db_pool import db_pool
-from controllers.utility import Config
-import random
-
 from discord import Intents, Status, Activity, ActivityType, Bot
 
+from ORM import Guild
+from controllers.db_pool import db_pool
+from controllers.utility import Config
 from managers import settings_manager, SettingsManager
 from managers.settings.guild_settings import SettingKey
 from modules.leveling.utils import process_leveling_for_message
-
 
 intents = Intents(messages=True, guilds=True, members=True, message_content=True)
 config = Config()
@@ -23,7 +19,7 @@ bot = Bot(
     allowed_mentions=discord.AllowedMentions(
         everyone=False,  # Disable @everyone mentions
         users=True,  # Enable @user mentions
-        roles=True,  # Disable @role mentions
+        roles=False,  # Disable @role mentions
     )
 )
 
@@ -33,6 +29,7 @@ async def on_connect() -> None:
     print("Connecting to discord...")
     await db_pool.init_pool()
     config.load_extensions(bot)
+
 
 @bot.listen()
 async def on_reconnect() -> None:
@@ -56,6 +53,7 @@ async def on_disconnect() -> None:
     await db_pool.close_pool()
     await bot.close()
 
+
 @bot.listen()
 async def on_message(message):
     if message.author.bot:
@@ -68,6 +66,7 @@ async def on_message(message):
 
     leveling_message = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=message.guild.id, setting_key=SettingKey.LEVEL_UP_MESSAGE)
     await message.channel.send(leveling_message.format(user=message.author, level=level))
+
 
 @bot.listen()
 async def on_member_join(member):
@@ -86,10 +85,12 @@ async def on_member_join(member):
     channel = bot.get_channel(config.get("joins_channel"))
     await channel.send(embed=embed)
 
+
 @bot.listen()
 async def on_guild_join(guild: discord.Guild):
     await Guild.create_or_update(guild)
     print(f"Joined guild: {guild.name} (ID: {guild.id})")
+
 
 if __name__ == "__main__":
     bot.run(config.get("bot_token"))

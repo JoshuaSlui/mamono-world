@@ -13,7 +13,8 @@ class CommandChecks(commands.Cog):
     def cog_unload(self):
         self.bot.remove_check(self.global_check)  # Clean up when cog is unloaded
 
-    async def global_check(self, ctx: discord.ApplicationContext):
+    @staticmethod
+    async def global_check(ctx: discord.ApplicationContext):
         """Check if the user is active."""
         user, _ = await User.objects.get_or_create(id=ctx.user.id)
 

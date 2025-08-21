@@ -3,6 +3,7 @@ from controllers.database import execute
 
 T = TypeVar("T", bound="AsyncORMBase")
 
+
 class QuerySet(Generic[T]):
     def __init__(self, model_cls: Type[T]):
         self.model_cls = model_cls
@@ -57,9 +58,11 @@ class QuerySet(Generic[T]):
         instance = await self.get(**kwargs)
         return instance, True
 
+
 class Manager(Generic[T]):
     def __get__(self, instance, owner) -> "QuerySet[T]":
         return QuerySet(owner)
+
 
 class AsyncORMBase:
     table_name: str = ""

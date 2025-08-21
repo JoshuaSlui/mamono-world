@@ -1,7 +1,5 @@
-import os
-
 import discord
-from discord import commands
+
 from ORM import Level  # Your existing Level model
 from managers import settings_manager, SettingsManager
 from managers.settings.guild_settings import SettingKey
@@ -18,7 +16,7 @@ class LevelingCog(discord.Cog):
         is_module_enabled = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=ctx.guild.id, setting_key=SettingKey.LEVEL_UP_ENABLED)
         return is_module_enabled
 
-    level = commands.SlashCommandGroup("level", "Leveling commands")
+    level = discord.SlashCommandGroup("level", "Leveling commands")
 
     @level.command()
     async def rank(self, ctx):
@@ -40,14 +38,16 @@ class LevelingCog(discord.Cog):
 
         await ctx.respond(file=card)
 
-    def truncate_text(self, draw, text, font, max_width):
-        ellipsis = "..."
+    @staticmethod
+    def truncate_text(draw, text, font, max_width):
+        ellipsis_string = "..."
         if draw.textlength(text, font=font) <= max_width:
             return text
         else:
-            while draw.textlength(text + ellipsis, font=font) > max_width and len(text) > 0:
+            while draw.textlength(text + ellipsis_string, font=font) > max_width and len(text) > 0:
                 text = text[:-1]
-            return text + ellipsis
+            return text + ellipsis_string
+
 
 def setup(bot: discord.Bot):
     bot.add_cog(LevelingCog(bot))

@@ -5,9 +5,11 @@ import discord
 from PIL import Image, ImageDraw, ImageFont, ImageOps, ImageFilter
 
 from ORM import Level
+from modules.leveling.commands import LevelingCog
 
 here = os.path.dirname(os.path.abspath(__file__))  # projectroot/modules/leveling
 font_path = os.path.normpath(os.path.join(here, "..", "..", "files", "PressStart2P-Regular.ttf"))
+
 
 async def generate_rank_card(user, level_data):
     # Card setup
@@ -69,7 +71,8 @@ async def generate_rank_card(user, level_data):
     buffer.seek(0)
     return discord.File(buffer, filename="shadow_rank_card.png")
 
-async def generate_leaderboard_card(self, top_users):
+
+async def generate_leaderboard_card(cog: LevelingCog, top_users):
     width, height = 800, 70 * len(top_users) + 80
     image = Image.new("RGBA", (width, height), (13, 13, 13, 255))
     draw = ImageDraw.Draw(image)
@@ -86,7 +89,7 @@ async def generate_leaderboard_card(self, top_users):
         if level.xp <= 0:
             continue
         try:
-            member = await self.bot.fetch_user(level.user)
+            member = await cog.bot.fetch_user(level.user)
             avatar_asset = member.display_avatar.replace(static_format="png")
             avatar_bytes = await avatar_asset.read()
             avatar = Image.open(BytesIO(avatar_bytes)).resize((50, 50)).convert("RGBA")
@@ -94,7 +97,7 @@ async def generate_leaderboard_card(self, top_users):
             image.paste(avatar, (40, y), avatar)
 
             max_name_width = 250  # adjust to your layout, so it fits nicely
-            truncated_name = self.truncate_text(draw, member.display_name, font_entry, max_name_width)
+            truncated_name = LevelingCog.truncate_text(draw, member.display_name, font_entry, max_name_width)
             draw.text((110, y + 5), f"#{idx} {truncated_name}", font=font_entry, fill=(255, 255, 255))
             draw.text((500, y + 5), f"Lvl {level.level}", font=font_entry, fill=(200, 200, 200))
 

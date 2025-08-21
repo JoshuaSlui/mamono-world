@@ -2,11 +2,13 @@ from enum import Enum
 from dataclasses import dataclass
 from typing import Any, Type
 
+
 @dataclass
 class SettingDefinition:
     default: Any
     value_type: Type
     description: str
+
 
 class SettingKey(Enum):
     LEVEL_UP_MESSAGE = SettingDefinition(

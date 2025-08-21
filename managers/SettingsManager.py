@@ -3,10 +3,12 @@ from typing import Any, Type
 
 from managers.settings.guild_settings import SettingKey
 
+
 class Scopes(Enum):
     GLOBAL = "global"
     GUILD = "guild"
     USER = "user"
+
 
 class SettingsManager:
     def __init__(self, model_cls, schema_enum):
@@ -73,17 +75,19 @@ class SettingsManager:
         id_cache = scope_cache.setdefault(scope_id, {})
         id_cache[setting_key.name] = value
 
-    async def invalidate_cache(self, scope_type: Scopes, scope_id: int):
+    def invalidate_cache(self, scope_type: Scopes, scope_id: int):
         if scope_type in self._cache:
             self._cache[scope_type].pop(scope_id, None)
 
-    def _serialize(self, value: Any) -> str:
+    @staticmethod
+    def _serialize(value: Any) -> str:
         import json
         if isinstance(value, (dict, list)):
             return json.dumps(value)
         return str(value)
 
-    def _deserialize(self, raw_value: str, value_type: Type) -> Any:
+    @staticmethod
+    def _deserialize(raw_value: str, value_type: Type) -> Any:
         import json
         if value_type == bool:
             return raw_value.lower() in ("1", "true", "yes", "on")

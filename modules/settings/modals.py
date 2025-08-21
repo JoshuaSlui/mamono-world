@@ -3,17 +3,20 @@ from discord.ui import Modal, InputText
 from managers import settings_manager, SettingsManager
 from managers.settings.guild_settings import SettingKey
 
+
 def is_truthy(value):
     return str(value).strip().lower() in ("true", "1", "yes", "on", "y", "t", "enabled", "enable")
+
 
 class JoinLogModal(Modal):
     def __init__(self, guild: discord.Guild, channel: discord.TextChannel = None, enabled: str = "", message: str = ""):
         super().__init__(title="Join Log Settings")
         self.guild = guild
         self.channel = channel
-
-        self.enabled_status = self.add_item(InputText(label="Enable Join Logs", value=enabled))
-        self.message = self.add_item(InputText(label="Join Log Message", value=message))
+        self.enabled_status = InputText(label="Enable Join Logs", value=enabled)
+        self.message = InputText(label="Join Log Message", value=message)
+        self.add_item(self.enabled_status)
+        self.add_item(self.message)
 
     @classmethod
     async def create(cls, guild: discord.Guild, channel: discord.TextChannel = None):
@@ -37,10 +40,8 @@ class JoinLogModal(Modal):
             SettingKey.LOGS_JOIN_CHANNEL_ID
         )
         if enabled and not current_channel:
-            return await interaction.response.send_message(
-                "You must provide a channel if join logs are enabled.",
-                ephemeral=True
-            )
+            return await interaction.respond(
+                "You must provide a channel if join logs are enabled.", ephemeral=True)
 
         # Save updated settings
         await settings_manager.set(SettingsManager.SCOPES_GUILD, self.guild.id, SettingKey.LOGS_JOIN_ENABLED, enabled)
@@ -48,4 +49,4 @@ class JoinLogModal(Modal):
             await settings_manager.set(SettingsManager.SCOPES_GUILD, self.guild.id, SettingKey.LOGS_JOIN_CHANNEL_ID, self.channel.id)
         await settings_manager.set(SettingsManager.SCOPES_GUILD, self.guild.id, SettingKey.LOGS_JOIN_MESSAGE, message_input)
 
-        return await interaction.response.send_message("Join logs settings updated successfully!", ephemeral=True)
+        return await interaction.respond("Join logs settings updated successfully!", ephemeral=True)
