@@ -10,12 +10,13 @@ class Info(discord.Cog):
 
     @utility.command()
     async def info(self, ctx):
-        embed = discord.Embed()
-        embed.colour = discord.Color.blurple()
-        embed.description = f"""
-**API Latency:** {round(self.bot.latency * 1000)}ms
-"""
-        await ctx.respond(embed=embed)
+        components = [
+            discord.ui.Container(
+                discord.ui.TextDisplay(f"**API Latency:** {round(self.bot.latency * 1000)}ms"),
+                color=discord.Color.blurple()
+            )
+        ]
+        await ctx.respond(view=discord.ui.View(*components))
 
     @ext_commands.has_role(1381328751845179522)
     @utility.command()

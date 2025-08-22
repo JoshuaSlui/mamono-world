@@ -70,20 +70,22 @@ async def on_message(message):
 
 @bot.listen()
 async def on_member_join(member):
-    embed = discord.Embed()
-    embed.set_author(
-        name="- Mamono Management",
-        icon_url="https://cdn.discordapp.com/attachments/1369382913241649313/1371960397598294036/shadesilly.png?ex=68343270&is=6832e0f0&hm=1c376876f6f530116c5d1628de1a417c9b304ae2fcf159f172cc232333af18bd&"
-    )
-    embed.title = f"Welcome {member.display_name}!"
-    embed.description = """
-        Welcome to Mamono World! Please verify in <id:customize>!
-        Afterwards, please introduce yourself and feel free to enjoy our community!!!!
-    """
-    embed.set_thumbnail(url=member.display_avatar.url)
-    embed.colour = discord.Colour.purple()
+    components = [
+        discord.ui.Container(
+            discord.ui.Section(
+                discord.ui.TextDisplay("Mamono Management"),
+                discord.ui.TextDisplay(f"### Welcome {member.mention}!"),
+                discord.ui.TextDisplay("""
+Welcome to Mamono World! Please verify in <id:customize>!
+Afterwards, please introduce yourself and feel free to enjoy our community!!!!
+                """),
+                accessory=discord.ui.Thumbnail(url=member.display_avatar.url)),
+            color=discord.Color.purple()
+        )
+    ]
+
     channel = bot.get_channel(config.get("joins_channel"))
-    await channel.send(embed=embed)
+    await channel.send(view=discord.ui.View(*components))
 
 
 @bot.listen()
