@@ -37,7 +37,7 @@ async def process_member_join(member: discord.Member) -> tuple[bool, None] | tup
     if not join_logs_enabled:
         return False, None
 
-    join_logs_channel = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=guild.id,setting_key=SettingKey.LOGS_JOIN_CHANNEL_ID)
+    join_logs_channel = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=guild.id, setting_key=SettingKey.LOGS_JOIN_CHANNEL_ID)
     join_logs_channel = guild.get_channel(join_logs_channel) if join_logs_channel else None
     if not join_logs_channel:
         return False, None
