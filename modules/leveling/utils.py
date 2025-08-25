@@ -37,7 +37,7 @@ async def process_member_join(member: discord.Member) -> tuple[bool, None] | tup
     if not join_logs_enabled:
         return False, None
 
-    join_logs_channel = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=guild.id,setting_key=SettingKey.LOGS_JOIN_CHANNEL_ID)
+    join_logs_channel = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=guild.id, setting_key=SettingKey.LOGS_JOIN_CHANNEL_ID)
     join_logs_channel = guild.get_channel(join_logs_channel) if join_logs_channel else None
     if not join_logs_channel:
         return False, None
@@ -46,7 +46,7 @@ async def process_member_join(member: discord.Member) -> tuple[bool, None] | tup
 
     embed = discord.Embed()
     embed.set_author(name=f"{member.display_name} joined the server", icon_url=guild.icon.url)
-    embed.thumbnail = member.avatar.url
+    embed.set_thumbnail(url=member.avatar.url)
     embed.description = await process_message_with_params(join_logs_message, user=member, guild=guild)
     embed.colour = member.colour
 
