@@ -12,8 +12,10 @@ class JoinLogModal(Modal):
         self.guild = guild
         self.channel = channel
 
-        self.enabled_status = self.add_item(InputText(label="Enable Join Logs", value=enabled))
-        self.message = self.add_item(InputText(label="Join Log Message", value=message))
+        self.enabled_status = InputText(label="Enable Join Logs", value=enabled)
+        self.message = InputText(label="Join Log Message", value=message)
+        self.add_item(self.enabled_status)
+        self.add_item(self.message)
 
     @classmethod
     async def create(cls, guild: discord.Guild, channel: discord.TextChannel = None):
