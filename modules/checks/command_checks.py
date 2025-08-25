@@ -2,8 +2,8 @@ import discord
 from discord.ext import commands
 
 from ORM import User
+from controllers import setup_logger
 from main import config
-
 
 class CommandChecks(commands.Cog):
     def __init__(self, bot: discord.Bot):
@@ -45,12 +45,13 @@ class CommandChecks(commands.Cog):
                     ephemeral=True,
                 )
             else:
+                logger = setup_logger()
+                logger.error(f"Error in command {ctx.command}: {error}")
                 await ctx.respond(
                     "`[500]` **An error occurred while processing your request.**",
                     ephemeral=True,
                 )
-                raise error
-
+                return
 
 def setup(bot: discord.Bot):
     bot.add_cog(CommandChecks(bot))
