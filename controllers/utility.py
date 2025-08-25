@@ -19,15 +19,11 @@ class Config:
         return config_class.data[value]
 
     @staticmethod
-    def load_extensions(bot: discord.Bot, base_folder="modules", exclude=None):
-        exclude = exclude or []
+    def load_extensions(bot: discord.Bot, base_folder="modules"):
         for root, _, files in os.walk(base_folder):
             for file in files:
-                if file.endswith(".py") and not file.startswith("__"):
-                    # Get relative module path: e.g. modules.birthdays.commands -> "modules.birthdays.commands"
+                if file == "commands.py" or file == "command_checks.py":
                     rel_path = os.path.relpath(os.path.join(root, file), ".").replace(os.sep, ".")
                     module_name = rel_path[:-3]  # remove ".py"
-                    if file in exclude or module_name in exclude:
-                        continue
                     bot.load_extension(module_name)
                     print(f"Loaded extension: {module_name}")
