@@ -46,7 +46,7 @@ async def process_member_join(member: discord.Member) -> tuple[bool, None] | tup
 
     embed = discord.Embed()
     embed.set_author(name=f"{member.display_name} joined the server", icon_url=guild.icon.url)
-    embed.thumbnail = member.avatar.url
+    embed.set_thumbnail(url=member.avatar.url)
     embed.description = await process_message_with_params(join_logs_message, user=member, guild=guild)
     embed.colour = member.colour
 
