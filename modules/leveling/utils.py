@@ -45,8 +45,8 @@ async def process_member_join(member: discord.Member) -> tuple[bool, None] | tup
     join_logs_message = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=guild.id, setting_key=SettingKey.LOGS_JOIN_MESSAGE)
 
     embed = discord.Embed()
-    embed.set_author(name=f"{member.display_name} joined the server", icon_url=guild.icon.url)
-    embed.set_thumbnail(url=member.avatar.url)
+    embed.set_author(name=f"{member.display_name} joined the server", icon_url=guild.icon.url if guild.icon else None)
+    embed.set_thumbnail(url=member.avatar.url if member.avatar else None)
     embed.description = await process_message_with_params(join_logs_message, user=member, guild=guild)
     embed.colour = member.colour
 
