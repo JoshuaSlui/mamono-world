@@ -28,7 +28,7 @@ class QuerySet(Generic[T]):
         return [self.model_cls(**row) for row in rows]
 
     async def get(self, **kwargs: Any) -> Optional[T]:
-        self.filter(**kwargs)
+        await self.filter(**kwargs)
         results = await self.all()
         if not results:
             return None
