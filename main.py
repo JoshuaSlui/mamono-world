@@ -22,7 +22,7 @@ bot = Bot(
     allowed_mentions=discord.AllowedMentions(
         everyone=False,  # Disable @everyone mentions
         users=True,  # Enable @user mentions
-        roles=True,  # Disable @role mentions
+        roles=False,  # Disable @role mentions
     )
 )
 
