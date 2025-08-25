@@ -47,7 +47,7 @@ async def process_member_join(member: discord.Member) -> tuple[bool, None] | tup
     embed = discord.Embed()
     embed.set_author(name=f"{member.display_name} joined the server", icon_url=guild.icon.url)
     embed.thumbnail = member.avatar.url
-    embed.description = await message_params_processor(join_logs_message, user=member, guild=guild)
+    embed.description = await process_message_with_params(join_logs_message, user=member, guild=guild)
     embed.colour = member.colour
 
     return True, {"channel": join_logs_channel, "embed": embed}
@@ -57,10 +57,12 @@ async def message_params_processor(
     message: str,
     user: discord.User | discord.Member = None,
     guild: discord.Guild = None,
+    level: Level = None,  # your Level ORM object
 ) -> str:
     """
-    Replaces whitelisted placeholders for any supported object in the message string.
-    Placeholders look like {user.name}, {guild.id}, etc.
+    Replaces whitelisted placeholders for supported objects in the message string.
+    Supports: {user.name}, {user.display_name}, {user.id}, {guild.name}, {guild.id},
+              {user.level}, {user.xp}.
     """
 
     obj_map = {
@@ -72,8 +74,34 @@ async def message_params_processor(
         obj_type = match.group(1)
         attr = match.group(2)
         obj = obj_map.get(obj_type)
-        if not obj:
-            return match.group(0)  # leave placeholder intact
-        return str(getattr(obj, attr, match.group(0)))
+
+        # 1. Check normal user/guild attributes
+        if obj is not None and hasattr(obj, attr):
+            return str(getattr(obj, attr))
+
+        # 2. Check level object for xp/level
+        if obj_type == "user" and level is not None and hasattr(level, attr):
+            return str(getattr(level, attr))
+
+        # 3. Fallback: leave placeholder as-is
+        return match.group(0)
 
     return settings.PARSER_PATTERN.sub(replace, message)
+
+
+async def process_message_with_params(
+        message: str,
+        user: discord.User | discord.Member = None,
+        guild: discord.Guild = None,
+) -> str:
+    """
+    Conditionally fetches Level object only if {user.level} or {user.xp} exist,
+    then calls the parser.
+    """
+    level_placeholder_pattern = re.compile(r"{user\.(level|xp)}")
+    level_obj = None
+
+    if level_placeholder_pattern.search(message) and user and guild:
+        level_obj = await Level.objects.get(user=user.id, guild=guild.id)
+
+    return await message_params_processor(message, level=level_obj, user=user, guild=guild)

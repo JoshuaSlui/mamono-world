@@ -8,7 +8,7 @@ from discord import Intents, Status, Activity, ActivityType, Bot
 
 from managers import settings_manager, SettingsManager
 from managers.settings.guild_settings import SettingKey
-from modules.leveling.utils import process_leveling_for_message, process_member_join
+from modules.leveling.utils import process_leveling_for_message, process_member_join, process_message_with_params
 
 intents = Intents(messages=True, guilds=True, members=True, message_content=True)
 config = Config()
@@ -65,7 +65,8 @@ async def on_message(message):
         return
 
     leveling_message = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=message.guild.id, setting_key=SettingKey.LEVEL_UP_MESSAGE)
-    await message.channel.send(leveling_message.format(user=message.author, level=level))
+    parsed_leveling_message = await process_message_with_params(leveling_message, user=message.author, guild=message.guild)
+    await message.channel.send(parsed_leveling_message)
 
 @bot.listen()
 async def on_member_join(member: discord.Member):
