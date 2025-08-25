@@ -13,7 +13,6 @@ class QuerySet(Generic[T]):
         for key, value in kwargs.items():
             self._filters.append(f"{key} = %s")
             self._params.append(value)
-            print(self)
         return self
 
     def __await__(self):
