@@ -9,8 +9,7 @@ from discord import Intents, Status, Activity, ActivityType, Bot
 
 from managers import settings_manager, SettingsManager
 from managers.settings.guild_settings import SettingKey
-from modules.leveling.utils import process_leveling_for_message
-
+from modules.leveling.utils import process_leveling_for_message, process_member_join
 
 intents = Intents(messages=True, guilds=True, members=True, message_content=True)
 config = Config()
@@ -70,20 +69,18 @@ async def on_message(message):
     await message.channel.send(leveling_message.format(user=message.author, level=level))
 
 @bot.listen()
-async def on_member_join(member):
-    embed = discord.Embed()
-    embed.set_author(
-        name="- Mamono Management",
-        icon_url="https://cdn.discordapp.com/attachments/1369382913241649313/1371960397598294036/shadesilly.png?ex=68343270&is=6832e0f0&hm=1c376876f6f530116c5d1628de1a417c9b304ae2fcf159f172cc232333af18bd&"
-    )
-    embed.title = f"Welcome {member.display_name}!"
-    embed.description = """
-        Welcome to Mamono World! Please verify in <id:customize>!
-        Afterwards, please introduce yourself and feel free to enjoy our community!!!!
-    """
-    embed.set_thumbnail(url=member.display_avatar.url)
-    embed.colour = discord.Colour.purple()
-    channel = bot.get_channel(config.get("joins_channel"))
+async def on_member_join(member: discord.Member):
+    if member.bot:
+        return
+
+    enabled, embed = await process_member_join(member)
+
+    if not enabled or not embed:
+        return
+
+    channel = embed.get("channel")
+    embed = embed.get("embed")
+
     await channel.send(embed=embed)
 
 @bot.listen()

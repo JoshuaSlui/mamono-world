@@ -1,7 +1,7 @@
 import random
 import discord
 import re
-from typing import Tuple, Any
+from typing import Tuple
 
 import settings
 from ORM import Level
@@ -34,6 +34,28 @@ async def process_leveling_for_message(message) -> Tuple[bool, str | None]:
 USER_PARAM_PATTERN = re.compile(r"{user\.(" + "|".join(map(re.escape, settings.ALLOWED_USER_PARAMS)) + r")}")
 GUILD_PARAM_PATTERN = re.compile(r"{guild\.(" + "|".join(map(re.escape, settings.ALLOWED_GUILD_PARAMS)) + r")}")
 async def message_params_processor(message: str, user: discord.User = None, guild: discord.Guild = None) -> str:
+async def process_member_join(member: discord.Member) -> tuple[bool, None] | tuple[
+    bool, dict[str, discord.TextChannel | discord.Embed]]:
+    guild = member.guild
+    join_logs_enabled = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=guild.id, setting_key=SettingKey.LOGS_JOIN_ENABLED)
+    if not join_logs_enabled:
+        return False, None
+
+    join_logs_channel = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=guild.id,setting_key=SettingKey.LOGS_JOIN_CHANNEL_ID)
+    join_logs_channel = guild.get_channel(join_logs_channel) if join_logs_channel else None
+    if not join_logs_channel:
+        return False, None
+
+    join_logs_message = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=guild.id, setting_key=SettingKey.LOGS_JOIN_MESSAGE)
+
+    embed = discord.Embed()
+    embed.set_author(name=f"{member.display_name} joined the server", icon_url=guild.icon.url)
+    embed.thumbnail = member.avatar.url
+    embed.description = await message_params_processor(join_logs_message, user=member, guild=guild)
+    embed.colour = member.colour
+
+    return True, {"channel": join_logs_channel, "embed": embed}
+
     """
     Replaces whitelisted placeholders for a user object in the message string.
 
