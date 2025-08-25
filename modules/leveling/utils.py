@@ -30,10 +30,6 @@ async def process_leveling_for_message(message) -> Tuple[bool, str | None]:
 
     return True, user.level
 
-# Build regex dynamically from the whitelist
-USER_PARAM_PATTERN = re.compile(r"{user\.(" + "|".join(map(re.escape, settings.ALLOWED_USER_PARAMS)) + r")}")
-GUILD_PARAM_PATTERN = re.compile(r"{guild\.(" + "|".join(map(re.escape, settings.ALLOWED_GUILD_PARAMS)) + r")}")
-async def message_params_processor(message: str, user: discord.User = None, guild: discord.Guild = None) -> str:
 async def process_member_join(member: discord.Member) -> tuple[bool, None] | tuple[
     bool, dict[str, discord.TextChannel | discord.Embed]]:
     guild = member.guild
@@ -56,25 +52,28 @@ async def process_member_join(member: discord.Member) -> tuple[bool, None] | tup
 
     return True, {"channel": join_logs_channel, "embed": embed}
 
+
+async def message_params_processor(
+    message: str,
+    user: discord.User | discord.Member = None,
+    guild: discord.Guild = None,
+) -> str:
     """
-    Replaces whitelisted placeholders for a user object in the message string.
-
-    Supported placeholders:
-    {user.mention}
-    {user.name}
-    {user.display_name}
-    {user.id}
-    {guild.name}
-    {guild.id}
+    Replaces whitelisted placeholders for any supported object in the message string.
+    Placeholders look like {user.name}, {guild.id}, etc.
     """
-    def replace_match(match: re.Match) -> str:
-        attr = match.group(1)
-        value = getattr(user, attr, None)
-        if value is None and guild is not None:
-            value = getattr(guild, attr, None)
-        return str(value) if value is not None else match.group(0)
 
-    user_parsed = USER_PARAM_PATTERN.sub(replace_match, message)
-    guild_parsed = GUILD_PARAM_PATTERN.sub(replace_match, user_parsed)
+    obj_map = {
+        "user": user,
+        "guild": guild,
+    }
 
-    return guild_parsed
+    def replace(match: re.Match) -> str:
+        obj_type = match.group(1)
+        attr = match.group(2)
+        obj = obj_map.get(obj_type)
+        if not obj:
+            return match.group(0)  # leave placeholder intact
+        return str(getattr(obj, attr, match.group(0)))
+
+    return settings.PARSER_PATTERN.sub(replace, message)
