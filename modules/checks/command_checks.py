@@ -34,7 +34,7 @@ class CommandChecks(commands.Cog):
                 "`[403]` **You do not have permission to use this command.**",
                 ephemeral=True,
             )
-        if isinstance(error, discord.errors.CheckFailure):
+        elif isinstance(error, discord.errors.CheckFailure):
             await ctx.respond(
                 f"The {ctx.command.cog.qualified_name.lower()} module is currently disabled."
             )
