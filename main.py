@@ -3,11 +3,12 @@ import discord
 from ORM import Level, Guild
 from controllers.db_pool import db_pool
 from controllers.utility import Config
-import random
 
 from discord import Intents, Status, Activity, ActivityType, Bot
 
-from tasks import start_birthday_tasks
+from managers import settings_manager, SettingsManager
+from managers.settings.guild_settings import SettingKey
+from modules.leveling.utils import process_leveling_for_message, process_member_join, process_message_with_params
 
 intents = Intents(messages=True, guilds=True, members=True, message_content=True)
 config = Config()
@@ -20,7 +21,7 @@ bot = Bot(
     allowed_mentions=discord.AllowedMentions(
         everyone=False,  # Disable @everyone mentions
         users=True,  # Enable @user mentions
-        roles=True,  # Disable @role mentions
+        roles=False,  # Disable @role mentions
     )
 )
 
@@ -29,7 +30,7 @@ bot = Bot(
 async def on_connect() -> None:
     print("Connecting to discord...")
     await db_pool.init_pool()
-    config.load_extensions(bot, exclude=["modals.py", "utility.py", "cards.py"])
+    config.load_extensions(bot)
 
 @bot.listen()
 async def on_reconnect() -> None:
@@ -44,7 +45,7 @@ async def on_ready() -> None:
         activity=Activity(type=ActivityType.streaming, name="Watching Mamono")
     )
     print(f'Authenticated with modules:\n{"\n".join(bot.extensions).replace('.', '/')}')
-    await start_birthday_tasks(bot)
+    # await start_birthday_tasks(bot)
 
 
 @bot.listen()
@@ -58,40 +59,28 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    user_id = message.author.id
-    user, _ = await Level.objects.get_or_create(user=user_id, guild=message.guild.id)
+    leveled_up, level = await process_leveling_for_message(message)
 
-    if not await user.can_gain_xp(cooldown_seconds=60):
-        return  # 👀 Slow down, speedy demon
+    if not leveled_up:
+        return
 
-    gained_xp = random.randint(10, 20)
-    leveled_up = await user.add_xp(gained_xp)   
-
-    if leveled_up:
-        if user.level >= 2 and not any(role.id == config.get("level_verification") for role in message.author.roles):
-            guild = message.guild
-            role = guild.get_role(config.get("level_verification"))
-            await message.author.add_roles(role)
-
-        await message.channel.send(
-            f"🎉 {message.author.display_name} leveled up to **level {user.level}**! keep being a chatty lil bean uwu"
-        )
+    leveling_message = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=message.guild.id, setting_key=SettingKey.LEVEL_UP_MESSAGE)
+    parsed_leveling_message = await process_message_with_params(leveling_message, user=message.author, guild=message.guild)
+    await message.channel.send(parsed_leveling_message)
 
 @bot.listen()
-async def on_member_join(member):
-    embed = discord.Embed()
-    embed.set_author(
-        name="- Mamono Management",
-        icon_url="https://cdn.discordapp.com/attachments/1369382913241649313/1371960397598294036/shadesilly.png?ex=68343270&is=6832e0f0&hm=1c376876f6f530116c5d1628de1a417c9b304ae2fcf159f172cc232333af18bd&"
-    )
-    embed.title = f"Welcome {member.display_name}!"
-    embed.description = """
-        Welcome to Mamono World! Please verify in <id:customize>!
-        Afterwards, please introduce yourself and feel free to enjoy our community!!!!
-    """
-    embed.set_thumbnail(url=member.display_avatar.url)
-    embed.colour = discord.Colour.purple()
-    channel = bot.get_channel(config.get("joins_channel"))
+async def on_member_join(member: discord.Member):
+    if member.bot:
+        return
+
+    enabled, embed = await process_member_join(member)
+
+    if not enabled or not embed:
+        return
+
+    channel = embed.get("channel")
+    embed = embed.get("embed")
+
     await channel.send(embed=embed)
 
 @bot.listen()
