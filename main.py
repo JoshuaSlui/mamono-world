@@ -54,6 +54,7 @@ async def on_disconnect() -> None:
     await db_pool.close_pool()
     await bot.close()
 
+
 @bot.listen()
 async def on_message(message):
     if message.author.bot:
@@ -67,6 +68,7 @@ async def on_message(message):
     leveling_message = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=message.guild.id, setting_key=SettingKey.LEVEL_UP_MESSAGE)
     parsed_leveling_message = await process_message_with_params(leveling_message, user=message.author, guild=message.guild)
     await message.channel.send(parsed_leveling_message)
+
 
 @bot.listen()
 async def on_member_join(member: discord.Member):

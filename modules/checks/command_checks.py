@@ -52,7 +52,7 @@ class CommandChecks(commands.Cog):
                     "`[500]` **An error occurred while processing your request.**",
                     ephemeral=True,
                 )
-                return
+
 
 def setup(bot: discord.Bot):
     bot.add_cog(CommandChecks(bot))

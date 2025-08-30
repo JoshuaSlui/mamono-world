@@ -53,7 +53,7 @@ async def process_member_join(member: discord.Member) -> tuple[bool, None] | tup
     return True, {"channel": join_logs_channel, "embed": embed}
 
 
-async def message_params_processor(
+def message_params_processor(
     message: str,
     user: discord.User | discord.Member = None,
     guild: discord.Guild = None,
@@ -104,4 +104,4 @@ async def process_message_with_params(
     if level_placeholder_pattern.search(message) and user and guild:
         level_obj = await Level.objects.get(user=user.id, guild=guild.id)
 
-    return await message_params_processor(message, level=level_obj, user=user, guild=guild)
+    return message_params_processor(message, level=level_obj, user=user, guild=guild)
