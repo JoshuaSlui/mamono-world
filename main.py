@@ -1,12 +1,14 @@
 import discord
-from discord import Intents, Status, Activity, ActivityType, Bot
 
-from ORM import Guild
+from ORM import Level, Guild
 from controllers.db_pool import db_pool
 from controllers.utility import Config
+
+from discord import Intents, Status, Activity, ActivityType, Bot
+
 from managers import settings_manager, SettingsManager
 from managers.settings.guild_settings import SettingKey
-from modules.leveling.utils import process_leveling_for_message
+from modules.leveling.utils import process_leveling_for_message, process_member_join, process_message_with_params
 
 intents = Intents(messages=True, guilds=True, members=True, message_content=True)
 config = Config()
@@ -30,7 +32,6 @@ async def on_connect() -> None:
     await db_pool.init_pool()
     config.load_extensions(bot)
 
-
 @bot.listen()
 async def on_reconnect() -> None:
     print("Reconnecting to discord...")
@@ -53,7 +54,6 @@ async def on_disconnect() -> None:
     await db_pool.close_pool()
     await bot.close()
 
-
 @bot.listen()
 async def on_message(message):
     if message.author.bot:
@@ -65,34 +65,28 @@ async def on_message(message):
         return
 
     leveling_message = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=message.guild.id, setting_key=SettingKey.LEVEL_UP_MESSAGE)
-    await message.channel.send(leveling_message.format(user=message.author, level=level))
-
+    parsed_leveling_message = await process_message_with_params(leveling_message, user=message.author, guild=message.guild)
+    await message.channel.send(parsed_leveling_message)
 
 @bot.listen()
-async def on_member_join(member):
-    components = [
-        discord.ui.Container(
-            discord.ui.Section(
-                discord.ui.TextDisplay("Mamono Management"),
-                discord.ui.TextDisplay(f"### Welcome {member.mention}!"),
-                discord.ui.TextDisplay("""
-Welcome to Mamono World! Please verify in <id:customize>!
-Afterwards, please introduce yourself and feel free to enjoy our community!!!!
-                """),
-                accessory=discord.ui.Thumbnail(url=member.display_avatar.url)),
-            color=discord.Color.purple()
-        )
-    ]
+async def on_member_join(member: discord.Member):
+    if member.bot:
+        return
 
-    channel = bot.get_channel(config.get("joins_channel"))
-    await channel.send(view=discord.ui.View(*components))
+    enabled, embed = await process_member_join(member)
 
+    if not enabled or not embed:
+        return
+
+    channel = embed.get("channel")
+    embed = embed.get("embed")
+
+    await channel.send(embed=embed)
 
 @bot.listen()
 async def on_guild_join(guild: discord.Guild):
     await Guild.create_or_update(guild)
     print(f"Joined guild: {guild.name} (ID: {guild.id})")
-
 
 if __name__ == "__main__":
     bot.run(config.get("bot_token"))

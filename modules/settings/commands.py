@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands as ext_commands
 from managers import settings_manager, SettingsManager
 from managers.settings.guild_settings import SettingKey
-from modules.leveling.utils import message_params_processor
+from modules.leveling.utils import process_message_with_params
 from modules.settings.modals import JoinLogModal
 
 
@@ -26,7 +26,7 @@ class SettingsCog(discord.Cog):
     @discord.option("message", str, description="The new level-up message")
     async def message(self, ctx: discord.ApplicationContext, message):
         await settings_manager.set(scope_type=SettingsManager.SCOPES_GUILD, scope_id=ctx.guild_id, setting_key=SettingKey.LEVEL_UP_MESSAGE, value=message)
-        parsed_message = message_params_processor(message, user=ctx.author)
+        parsed_message = await process_message_with_params(message, user=ctx.author, guild=ctx.guild)
         await ctx.respond(f"Level-up message updated to:\n\n{message}\n\nExample: {parsed_message}")
 
     @logs.command()
@@ -40,7 +40,6 @@ class SettingsCog(discord.Cog):
 
         modal = await JoinLogModal.create(ctx.guild, channel)
         await ctx.send_modal(modal)
-
 
 def setup(bot: discord.Bot):
     bot.add_cog(SettingsCog(bot))
