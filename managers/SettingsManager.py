@@ -4,7 +4,7 @@ from typing import Any, Type
 from managers.settings.guild_settings import SettingKey
 
 class Scopes(Enum):
-    GLOBAL = "global"
+    BOT = "bot"
     GUILD = "guild"
     USER = "user"
 
@@ -14,7 +14,7 @@ class SettingsManager:
         self.schema = schema_enum  # e.g., SettingKey
         self._cache = {}  # {scope_type: {scope_id: {setting_key: value}}}
 
-    SCOPES_GLOBAL = Scopes.GLOBAL
+    SCOPES_BOT = Scopes.BOT
     SCOPES_GUILD = Scopes.GUILD
     SCOPES_USER = Scopes.USER
 

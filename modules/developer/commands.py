@@ -5,6 +5,8 @@ from discord import commands
 from discord.ext import commands as ext_commands
 
 from controllers.logger import setup_logger
+from managers import settings_manager, SettingsManager
+from managers.settings.bot_settings import SettingKey
 
 
 class EvalModal(discord.ui.Modal):
@@ -67,6 +69,17 @@ class EvalCog(discord.Cog):
         setup_logger().info(f"Eval command used by {ctx.user.name} ({ctx.user.id})")
         modal = EvalModal()
         await ctx.send_modal(modal)
+
+    @ext_commands.is_owner()
+    @developer.command(name="exceptions", description="Change exception log channel")
+    async def exceptions(self, ctx: discord.ApplicationContext, channel: discord.TextChannel):
+        await settings_manager.set(
+            scope_type=SettingsManager.SCOPES_BOT,
+            scope_id=1,
+            setting_key=SettingKey.EXCEPTION_LOG,
+            value={"guild": channel.guild.id, "channel": channel.id}
+        )
+        await ctx.respond(f"Exception log channel set to {channel.mention}", ephemeral=True)
 
 
 def setup(bot: discord.Bot):
