@@ -2,8 +2,9 @@ import discord
 from discord.ext import commands
 
 from ORM import User
-from controllers import setup_logger
 from main import config
+from modules.checks.utility import handle_traceback
+
 
 class CommandChecks(commands.Cog):
     def __init__(self, bot: discord.Bot):
