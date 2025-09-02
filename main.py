@@ -30,7 +30,6 @@ bot = Bot(
 async def on_connect() -> None:
     print("Connecting to discord...")
     await db_pool.init_pool()
-    config.load_extensions(bot)
 
 @bot.listen()
 async def on_reconnect() -> None:
@@ -91,4 +90,5 @@ async def on_guild_join(guild: discord.Guild):
     print(f"Joined guild: {guild.name} (ID: {guild.id})")
 
 if __name__ == "__main__":
+    config.load_extensions(bot)
     bot.run(config.get("bot_token"))
