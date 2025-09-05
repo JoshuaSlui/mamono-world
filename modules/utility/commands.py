@@ -7,7 +7,19 @@ class Info(discord.Cog):
         self.bot = bot
 
     def calculate_oauth(self):
-        perms = discord.Permissions.advanced()
+        perms = discord.Permissions(
+            view_channel=True,
+            send_messages=True,
+            send_messages_in_threads=True,
+            embed_links=True,
+            attach_files=True,
+            read_message_history=True,
+            add_reactions=True,
+            external_emojis=True,
+            external_stickers=True,
+            send_polls=True,
+            use_slash_commands=True
+        )
         return discord.utils.oauth_url(
             self.bot.user.id,
             permissions=perms,
