@@ -31,9 +31,9 @@ class Info(discord.Cog):
         info_embed = Embed(
             title=f"About {self.bot.user.name}",
             description=f"""
-        {self.bot.user.name} is a multifunctional Discord bot designed to enhance your server experience with a variety of features including leveling, join logs and more.
-        We are constantly working to add new features and improve existing ones. Want to know more or add the bot to your own server? Use the buttons below!
-        """
+{self.bot.user.name} is a multifunctional Discord bot designed to enhance your server experience with a variety of features including leveling, join logs and more.
+We are constantly working to add new features and improve existing ones. Want to know more or add the bot to your own server? Use the buttons below!
+"""
         )
         info_embed.set_thumbnail(url=self.bot.user.display_avatar.url)
 
