@@ -5,6 +5,7 @@ import discord
 from PIL import Image, ImageDraw, ImageFont, ImageOps, ImageFilter
 
 from ORM import Level
+from modules.leveling.utils import truncate_text
 
 here = os.path.dirname(os.path.abspath(__file__))  # projectroot/modules/leveling
 font_path = os.path.normpath(os.path.join(here, "..", "..", "files", "PressStart2P-Regular.ttf"))
@@ -94,7 +95,7 @@ async def generate_leaderboard_card(self, top_users):
             image.paste(avatar, (40, y), avatar)
 
             max_name_width = 250  # adjust to your layout, so it fits nicely
-            truncated_name = self.truncate_text(draw, member.display_name, font_entry, max_name_width)
+            truncated_name = truncate_text(draw, member.display_name, font_entry, max_name_width)
             draw.text((110, y + 5), f"#{idx} {truncated_name}", font=font_entry, fill=(255, 255, 255))
             draw.text((500, y + 5), f"Lvl {level.level}", font=font_entry, fill=(200, 200, 200))
 
