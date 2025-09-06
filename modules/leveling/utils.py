@@ -105,3 +105,12 @@ async def process_message_with_params(
         level_obj = await Level.objects.get(user=user.id, guild=guild.id)
 
     return await message_params_processor(message, level=level_obj, user=user, guild=guild)
+
+def truncate_text(draw, text, font, max_width):
+    ellipsis = "..."
+    if draw.textlength(text, font=font) <= max_width:
+        return text
+    else:
+        while draw.textlength(text + ellipsis, font=font) > max_width and len(text) > 0:
+            text = text[:-1]
+        return text + ellipsis
