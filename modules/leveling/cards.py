@@ -72,7 +72,19 @@ async def generate_rank_card(user, level_data):
     return discord.File(buffer, filename="shadow_rank_card.png")
 
 
-async def generate_leaderboard(bot: discord.Bot, users: List[TypeVar("LevelT", bound=Level)], start_index=0, current_user_id=None, page=1, total_pages=1):
+async def generate_leaderboard(bot: discord.Bot, users: List[TypeVar("LevelT", bound=Level)], start_index=0, current_user_id=None, page=1, total_pages=1) -> discord.Embed:
+    """
+    Generates a Discord embed representing the leaderboard.
+    Check versions below 4.0.0 for PIL-based card generation.
+
+    :param bot: The Discord bot instance
+    :param users: List of Level ORM objects
+    :param start_index: The starting index for numbering
+    :param current_user_id: The ID of the user viewing the leaderboard
+    :param page: Current page number
+    :param total_pages: Total number of pages
+    :return: A Discord Embed object
+    """
     embed = discord.Embed(
         title="🏆 Server Leaderboard",
         colour=discord.Color.blurple(),
@@ -104,41 +116,3 @@ async def generate_leaderboard(bot: discord.Bot, users: List[TypeVar("LevelT", b
     embed.set_footer(text=f"Page {page} / {total_pages}")
 
     return embed
-
-# Keeping this function in as we may want to re-use this in the future
-# async def generate_leaderboard_card(bot, top_users):
-#     width, height = 800, 70 * len(top_users) + 80
-#     image = Image.new("RGBA", (width, height), (13, 13, 13, 255))
-#     draw = ImageDraw.Draw(image)
-#
-#     font_title = ImageFont.truetype(font_path, 28)
-#     font_entry = ImageFont.truetype(font_path, 20)
-#
-#     draw.text((width // 2 - 150, 20), "🏆 Leaderboard", font=font_title, fill=(255, 255, 255))
-#
-#     y = 80
-#     for idx, level in enumerate(top_users, start=1):
-#         if level.xp <= 0:
-#             continue
-#         try:
-#             member = await bot.fetch_user(level.user)
-#             avatar_asset = member.display_avatar.replace(static_format="png")
-#             avatar_bytes = await avatar_asset.read()
-#             avatar = Image.open(BytesIO(avatar_bytes)).resize((50, 50)).convert("RGBA")
-#             avatar = ImageOps.expand(avatar, border=2, fill=(255, 0, 0))
-#             image.paste(avatar, (40, y), avatar)
-#
-#             max_name_width = 250
-#             truncated_name = truncate_text(draw, member.display_name, font_entry, max_name_width)
-#             draw.text((110, y + 5), f"#{idx} {truncated_name}", font=font_entry, fill=(255, 255, 255))
-#             draw.text((500, y + 5), f"Lvl {level.level}", font=font_entry, fill=(200, 200, 200))
-#
-#             y += 70
-#         except Exception as e:
-#             print(f"Error drawing user {level.user}: {e}")
-#             continue
-#
-#     buffer = BytesIO()
-#     image.save(buffer, "PNG")
-#     buffer.seek(0)
-#     return discord.File(buffer, filename="leaderboard.png")
