@@ -42,7 +42,7 @@ class LevelingCog(discord.Cog):
         await ctx.respond(file=card)
 
     @level.command()
-    @ext_commands.has_guild_permissions(manage_guild=True)
+    @discord.default_permissions(manage_guild=True)
     async def change_xp(self, ctx, member: discord.Member, xp: int):
         """Change a user's XP by a specified amount."""
         level_data, _ = await Level.objects.get_or_create(user=member.id, guild=ctx.guild.id)
