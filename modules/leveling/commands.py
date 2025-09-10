@@ -23,15 +23,18 @@ class LevelingCog(discord.Cog):
 
     @level.command()
     async def rank(self, ctx):
+        """Display your current rank and XP."""
+        await ctx.defer(ephemeral=True)
         user_id = ctx.author.id
         level_data, _ = await Level.objects.get_or_create(user=user_id, guild=ctx.guild.id)
 
         card = await generate_rank_card(ctx.author, level_data)
-        await ctx.respond(file=card)
+        await ctx.followup.send(file=card)
 
     @level.command()
     async def leaderboard(self, ctx):
         # Fetch and sort top users
+        await ctx.defer(ephemeral=True)
         all_levels = await Level.objects.filter(guild=ctx.guild.id)
 
         top_users = sorted(all_levels, key=lambda l: l.xp, reverse=True)[:10]
@@ -39,7 +42,7 @@ class LevelingCog(discord.Cog):
         # Set up canvas
         card = await generate_leaderboard_card(self, top_users)
 
-        await ctx.respond(file=card)
+        await ctx.followup.send(file=card)
 
     @level.command()
     @ext_commands.has_guild_permissions(manage_guild=True)
