@@ -22,7 +22,7 @@ class Level(AsyncORMBase):
 
     @staticmethod
     def level_from_xp(xp: int) -> int:
-        level = 1
+        level = 0
         total_xp = 0
         while total_xp + Level.xp_required(level) <= xp:
             total_xp += Level.xp_required(level)
