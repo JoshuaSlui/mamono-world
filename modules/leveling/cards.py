@@ -1,5 +1,6 @@
 import os
 from io import BytesIO
+from typing import List, TypeVar
 
 import discord
 from PIL import Image, ImageDraw, ImageFont, ImageOps, ImageFilter
@@ -70,7 +71,8 @@ async def generate_rank_card(user, level_data):
     buffer.seek(0)
     return discord.File(buffer, filename="shadow_rank_card.png")
 
-async def generate_leaderboard(bot: discord.Bot, users, start_index=0, current_user_id=None, page=1, total_pages=1):
+
+async def generate_leaderboard(bot: discord.Bot, users: List[TypeVar("LevelT", bound=Level)], start_index=0, current_user_id=None, page=1, total_pages=1):
     embed = discord.Embed(
         title="🏆 Server Leaderboard",
         colour=discord.Color.blurple(),
