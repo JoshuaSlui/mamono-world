@@ -15,14 +15,12 @@ class SettingsCog(discord.Cog):
     logs = settings.create_subgroup("logs", "Log settings")
 
     @level.command()
-    # @ext_commands.has_guild_permissions(manage_guild=True)
     @discord.option("enabled", bool, description="Enable or disable leveling")
     async def toggle(self, ctx: discord.ApplicationContext, enabled):
         await settings_manager.set(scope_type=SettingsManager.SCOPES_GUILD, scope_id=ctx.guild_id, setting_key=SettingKey.LEVEL_UP_ENABLED, value=enabled)
         await ctx.respond(f"Leveling has been {'enabled' if enabled else 'disabled'}!")
 
     @level.command()
-    # @ext_commands.has_guild_permissions(manage_guild=True)
     @discord.option("message", str, description="The new level-up message")
     async def message(self, ctx: discord.ApplicationContext, message):
         await settings_manager.set(scope_type=SettingsManager.SCOPES_GUILD, scope_id=ctx.guild_id, setting_key=SettingKey.LEVEL_UP_MESSAGE, value=message)
@@ -30,7 +28,6 @@ class SettingsCog(discord.Cog):
         await ctx.respond(f"Level-up message updated to:\n\n{message}\n\nExample: {parsed_message}")
 
     @logs.command()
-    # @ext_commands.has_guild_permissions(manage_guild=True)
     @discord.option("channel", discord.TextChannel, required=False, description="Channel for join logs")
     async def join(self, ctx: discord.ApplicationContext, channel: discord.TextChannel = None):
         """
