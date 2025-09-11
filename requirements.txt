@@ -1,8 +1,7 @@
-aiohttp==3.12.14
+aiohttp==3.12.15
 aiomysql==0.2.0
-audioop-lts==0.2.1
 py-cord~=2.7.0rc1
-PyMySQL==1.1.1
-ruff==0.11.11
+PyMySQL==1.1.2
+ruff==0.13.0
 black==25.1.0
 pillow~=11.3.0
