@@ -30,7 +30,7 @@ class LevelingCog(discord.Cog):
         level_data, _ = await Level.objects.get_or_create(user=user_id, guild=ctx.guild.id)
 
         card = await generate_rank_card(ctx.author, level_data)
-        await ctx.followup.send(file=card)
+        await ctx.respond(file=card)
 
     @level.command()
     async def leaderboard(self, ctx):
@@ -48,7 +48,7 @@ class LevelingCog(discord.Cog):
             total_pages=(len(sorted_users) - 1) // view.page_size + 1
         )
 
-        return await ctx.followup.send(embed=embed, view=view)
+        return await ctx.respond(embed=embed, view=view)
 
     @level.command()
     @ext_commands.has_guild_permissions(manage_guild=True)
