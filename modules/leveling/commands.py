@@ -6,7 +6,8 @@ from discord.ext import commands as ext_commands
 from ORM import Level
 from managers import settings_manager, SettingsManager
 from managers.settings.guild_settings import SettingKey
-from modules.leveling.cards import generate_rank_card, generate_leaderboard_card
+from modules.leveling.cards import generate_rank_card, generate_leaderboard
+from modules.leveling.views import LeaderboardView
 
 
 class LevelingCog(discord.Cog):
@@ -33,16 +34,21 @@ class LevelingCog(discord.Cog):
 
     @level.command()
     async def leaderboard(self, ctx):
-        # Fetch and sort top users
         await ctx.defer(ephemeral=True)
         all_levels = await Level.objects.filter(guild=ctx.guild.id)
+        if not all_levels:
+            return await ctx.followup.send("No one has any XP yet!", ephemeral=True)
 
-        top_users = sorted(all_levels, key=lambda l: l.xp, reverse=True)[:10]
+        sorted_users = sorted(all_levels, key=lambda l: l.xp, reverse=True)
 
-        # Set up canvas
-        card = await generate_leaderboard_card(self, top_users)
+        view = LeaderboardView(self.bot, sorted_users, current_user_id=ctx.author.id)
+        first_slice = sorted_users[:view.page_size]
+        embed = await generate_leaderboard(
+            self.bot, first_slice, current_user_id=ctx.author.id, page=1,
+            total_pages=(len(sorted_users) - 1) // view.page_size + 1
+        )
 
-        await ctx.followup.send(file=card)
+        return await ctx.followup.send(embed=embed, view=view)
 
     @level.command()
     @ext_commands.has_guild_permissions(manage_guild=True)
