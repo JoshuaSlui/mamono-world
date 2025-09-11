@@ -11,6 +11,7 @@ from controllers.utility import Config
 
 config = Config()
 
+
 async def process_leveling_for_message(message) -> Tuple[bool, str | None]:
     leveling_enabled = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=message.guild.id, setting_key=SettingKey.LEVEL_UP_ENABLED)
     if not leveling_enabled:
@@ -20,7 +21,7 @@ async def process_leveling_for_message(message) -> Tuple[bool, str | None]:
     user, _ = await Level.objects.get_or_create(user=user_id, guild=message.guild.id)
 
     if not await user.can_gain_xp(cooldown_seconds=60):
-        return False, None # User is on cooldown for gaining XP
+        return False, None  # User is on cooldown for gaining XP
 
     gained_xp = random.randint(10, 20)
     leveled_up = await user.add_xp(gained_xp)
@@ -30,8 +31,9 @@ async def process_leveling_for_message(message) -> Tuple[bool, str | None]:
 
     return True, user.level
 
+
 async def process_member_join(member: discord.Member) -> tuple[bool, None] | tuple[
-    bool, dict[str, discord.TextChannel | discord.Embed]]:
+                                bool, dict[str, discord.TextChannel | discord.Embed]]:
     guild = member.guild
     join_logs_enabled = await settings_manager.get(scope_type=SettingsManager.SCOPES_GUILD, scope_id=guild.id, setting_key=SettingKey.LOGS_JOIN_ENABLED)
     if not join_logs_enabled:
@@ -53,7 +55,7 @@ async def process_member_join(member: discord.Member) -> tuple[bool, None] | tup
     return True, {"channel": join_logs_channel, "embed": embed}
 
 
-async def message_params_processor(
+def message_params_processor(
     message: str,
     user: discord.User | discord.Member = None,
     guild: discord.Guild = None,
@@ -104,7 +106,8 @@ async def process_message_with_params(
     if level_placeholder_pattern.search(message) and user and guild:
         level_obj = await Level.objects.get(user=user.id, guild=guild.id)
 
-    return await message_params_processor(message, level=level_obj, user=user, guild=guild)
+    return message_params_processor(message, level=level_obj, user=user, guild=guild)
+
 
 def truncate_text(draw, text, font, max_width):
     ellipsis = "..."

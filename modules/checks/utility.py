@@ -44,6 +44,7 @@ async def handle_traceback(bot: discord.Bot, command, error):
 
     return "`[500]` **An error occurred while processing your request.**"
 
+
 async def check_user_birthday(user):
     birthdays = await Birthday.objects.get(user.id)
     for birthday in birthdays:

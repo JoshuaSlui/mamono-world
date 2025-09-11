@@ -31,6 +31,7 @@ async def on_connect() -> None:
     print("Connecting to discord...")
     await db_pool.init_pool()
 
+
 @bot.listen()
 async def on_reconnect() -> None:
     print("Reconnecting to discord...")
@@ -59,7 +60,7 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    leveled_up, level = await process_leveling_for_message(message)
+    leveled_up, _ = await process_leveling_for_message(message)
 
     if not leveled_up:
         return
@@ -83,6 +84,7 @@ async def on_member_join(member: discord.Member):
     embed = embed.get("embed")
 
     await channel.send(embed=embed)
+
 
 @bot.listen()
 async def on_guild_join(guild: discord.Guild):

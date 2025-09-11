@@ -1,4 +1,3 @@
-from typing import Optional
 from ORM.models import AsyncORMBase  # your existing base classes
 
 

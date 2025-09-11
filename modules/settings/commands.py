@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands as ext_commands
+
 from managers import settings_manager, SettingsManager
 from managers.settings.guild_settings import SettingKey
 from modules.leveling.utils import process_message_with_params
@@ -37,6 +37,7 @@ class SettingsCog(discord.Cog):
 
         modal = await JoinLogModal.create(ctx.guild, channel)
         await ctx.send_modal(modal)
+
 
 def setup(bot: discord.Bot):
     bot.add_cog(SettingsCog(bot))

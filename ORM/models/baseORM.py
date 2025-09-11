@@ -29,7 +29,7 @@ class QuerySet(Generic[T]):
 
     async def get(self, **kwargs: Any) -> Optional[T]:
         # noinspection PyAsyncCall
-        self.filter(**kwargs) #  PyCharm believes filter is async because of __await__, but it isn't
+        self.filter(**kwargs)  # PyCharm believes filter is async because of __await__, but it isn't
         results = await self.all()
         if not results:
             return None

@@ -1,5 +1,6 @@
 from controllers.database import execute
 
+
 async def upgrade():
     await execute("DROP TABLE IF EXISTS settings;")
 
@@ -14,6 +15,7 @@ async def upgrade():
             UNIQUE KEY unique_scope_key (scope_type, scope_id, setting_key)
         );
     """)
+
 
 async def downgrade():
     # TODO: Write downgrade logic here

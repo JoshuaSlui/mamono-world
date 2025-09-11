@@ -1,5 +1,5 @@
 import discord
-from discord import commands, Embed, ButtonStyle
+from discord import commands, Embed
 
 
 class Info(discord.Cog):
