@@ -72,7 +72,14 @@ async def generate_rank_card(user, level_data):
     return discord.File(buffer, filename="shadow_rank_card.png")
 
 
-async def generate_leaderboard(bot: discord.Bot, users: List[TypeVar("LevelT", bound=Level)], start_index=0, current_user_id=None, page=1, total_pages=1) -> discord.Embed:
+async def generate_leaderboard(
+    bot: discord.Bot,
+    users: List[TypeVar("LevelT", bound=Level)],
+    start_index=0,
+    current_user_id=None,
+    page=1,
+    total_pages=1
+) -> discord.Embed:
     """
     Generates a Discord embed representing the leaderboard.
     Check versions below 4.0.0 for PIL-based card generation.
@@ -92,7 +99,7 @@ async def generate_leaderboard(bot: discord.Bot, users: List[TypeVar("LevelT", b
     )
 
     lines = []
-    max_name_len = max(len(getattr(level, "user_name", f"User{level.user}")) for level in users) if users else 0
+    max_name_len = 0
 
     for idx, level in enumerate(users, start=start_index + 1):
         if level.xp <= 0:
@@ -105,13 +112,24 @@ async def generate_leaderboard(bot: discord.Bot, users: List[TypeVar("LevelT", b
             continue
 
         display_name = f"➡{discord_user.display_name}" if level.user == current_user_id else discord_user.display_name
-        line = f"{str(idx).zfill(2)} {display_name:<{max_name_len + 4}} Lvl {level.level:<3} | {level.xp} XP"
-        lines.append(line)
+        max_name_len = max(max_name_len, len(display_name))
 
-    if not lines:
-        lines.append("No users with XP yet.")
+        lines.append((idx, display_name, level.level, level.xp))
 
-    embed.add_field(name="Members", value=f"```{chr(10).join(lines)}```", inline=False)
+    # Apply padding & formatting
+    formatted_lines = [
+        f"{str(idx).zfill(2)} {name:<{max_name_len + 4}} Lvl {lvl:<3} | {xp} XP"
+        for idx, name, lvl, xp in lines
+    ]
+
+    if not formatted_lines:
+        formatted_lines.append("No users with XP yet.")
+
+    embed.add_field(
+        name="Members",
+        value=f"```{chr(10).join(formatted_lines)}```",
+        inline=False
+    )
 
     embed.set_footer(text=f"Page {page} / {total_pages}")
 
