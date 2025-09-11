@@ -6,7 +6,7 @@ async def upgrade():
     await execute("""
         CREATE TABLE settings (
             id INT PRIMARY KEY AUTO_INCREMENT,
-            scope_type ENUM('global', 'guild', 'user') NOT NULL,
+            scope_type ENUM('bot', 'guild', 'user') NOT NULL,
             scope_id BIGINT NOT NULL DEFAULT 0,
             setting_key VARCHAR(255) NOT NULL,
             value TEXT,

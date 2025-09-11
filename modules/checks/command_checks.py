@@ -2,8 +2,9 @@ import discord
 from discord.ext import commands
 
 from ORM import User
-from controllers import setup_logger
 from main import config
+from modules.checks.utility import handle_traceback
+
 
 class CommandChecks(commands.Cog):
     def __init__(self, bot: discord.Bot):
@@ -13,8 +14,7 @@ class CommandChecks(commands.Cog):
     def cog_unload(self):
         self.bot.remove_check(self.global_check)  # Clean up when cog is unloaded
 
-    @staticmethod
-    async def global_check(ctx: discord.ApplicationContext):
+    async def global_check(self, ctx: discord.ApplicationContext):
         """Check if the user is active."""
         user, _ = await User.objects.get_or_create(id=ctx.user.id)
 
@@ -29,30 +29,26 @@ class CommandChecks(commands.Cog):
     @commands.Cog.listener()
     async def on_application_command_error(self, ctx: discord.ApplicationContext, error):
         """Handle command errors globally."""
-        # This can be used to log errors or send a message to the user
         if isinstance(error, commands.CheckFailure):
-            await ctx.respond(
+            return await ctx.respond(
                 "`[403]` **You do not have permission to use this command.**",
                 ephemeral=True,
             )
         elif isinstance(error, discord.errors.CheckFailure):
-            await ctx.respond(
+            return await ctx.respond(
                 f"The {ctx.command.cog.qualified_name.lower()} module is currently disabled."
             )
-        else:
-            if config.get('debug'):
-                await ctx.respond(
-                    f"`[500]` **An error occurred: {error.__class__.__name__}**\n{error}",
-                    ephemeral=True,
-                )
-            else:
-                logger = setup_logger()
-                logger.error(f"Error in command {ctx.command}: {error}")
-                await ctx.respond(
-                    "`[500]` **An error occurred while processing your request.**",
-                    ephemeral=True,
-                )
 
+        if config.get("debug"):
+            return await ctx.respond(
+                f"`[500]` **{error.__class__.__name__}**\n{error}",
+                ephemeral=True,
+            )
+
+        command = ctx.command or "Unknown command"
+        message_response = await handle_traceback(self.bot, command, error)
+
+        return await ctx.respond(message_response, ephemeral=True)
 
 def setup(bot: discord.Bot):
     bot.add_cog(CommandChecks(bot))

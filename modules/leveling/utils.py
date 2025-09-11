@@ -53,7 +53,7 @@ async def process_member_join(member: discord.Member) -> tuple[bool, None] | tup
     return True, {"channel": join_logs_channel, "embed": embed}
 
 
-def message_params_processor(
+async def message_params_processor(
     message: str,
     user: discord.User | discord.Member = None,
     guild: discord.Guild = None,
@@ -104,4 +104,13 @@ async def process_message_with_params(
     if level_placeholder_pattern.search(message) and user and guild:
         level_obj = await Level.objects.get(user=user.id, guild=guild.id)
 
-    return message_params_processor(message, level=level_obj, user=user, guild=guild)
+    return await message_params_processor(message, level=level_obj, user=user, guild=guild)
+
+def truncate_text(draw, text, font, max_width):
+    ellipsis = "..."
+    if draw.textlength(text, font=font) <= max_width:
+        return text
+    else:
+        while draw.textlength(text + ellipsis, font=font) > max_width and len(text) > 0:
+            text = text[:-1]
+        return text + ellipsis

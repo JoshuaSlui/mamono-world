@@ -28,15 +28,10 @@ we would not be able to provide our services. The data we collect includes but m
 the following, which is collected automatically:
 
 > Your **discord user ID**, which we use to link your account to our services. This is
-> mainly used to track your activity to calculate vote scaling, and to ensure that your
-> votes and responses are correctly processed and linked to your account.
+> mainly used to track your settings if you are owner of a guild with configured settings, or activity in guilds
 
-> Your **discord username**, which we use to display your username in our services. This is
-> mainly used to display your username in our services, and to ensure that your votes and
-> responses are correctly processed and linked to your account.
-
-> Your **message timestamp**, which we use to track your activity to calculate vote scaling using
-> the amount of active members in the 7 days prior to your vote.
+> The **message timestamp** of your first message in a guild with the bot,
+> which we use to track when you first started messaging in the server.
 
 ## Third parties
 We may share your personal information with third parties only in the
@@ -103,7 +98,7 @@ identify you and your data. This will help us to provide you with the
 best service possible.
 
 ## Latest updates
-This privacy policy was last updated on March 17, 2025.
+This privacy policy was last updated on September 11, 2025.
 ```md
- - Added Privacy Policy
+ - Changed data being collected and reasons
 ```

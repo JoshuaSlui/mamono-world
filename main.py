@@ -1,6 +1,6 @@
 import discord
 
-from ORM import Level, Guild
+from ORM import Guild
 from controllers.db_pool import db_pool
 from controllers.utility import Config
 
