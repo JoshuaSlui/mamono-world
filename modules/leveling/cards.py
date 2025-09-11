@@ -11,6 +11,7 @@ from ORM import Level
 here = os.path.dirname(os.path.abspath(__file__))  # projectroot/modules/leveling
 font_path = os.path.normpath(os.path.join(here, "..", "..", "files", "PressStart2P-Regular.ttf"))
 
+
 async def generate_rank_card(user, level_data):
     # Card setup
     card_width, card_height = 800, 240

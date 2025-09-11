@@ -50,5 +50,7 @@ class CommandChecks(commands.Cog):
 
         return await ctx.respond(message_response, ephemeral=True)
 
+
 def setup(bot: discord.Bot):
     bot.add_cog(CommandChecks(bot))
+

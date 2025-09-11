@@ -1,5 +1,4 @@
 import discord
-from discord import SlashCommandGroup
 
 from ORM.models.Birthday import Birthday
 from modules.birthdays.modals import BirthdayModal
@@ -9,7 +8,7 @@ class BirthdayCog(discord.Cog):
     def __init__(self, bot: discord.Bot):
         self.bot = bot
 
-    birthday = SlashCommandGroup("birthday", "Manage your birthday")
+    birthday = discord.SlashCommandGroup("birthday", "Manage your birthday")
 
     @birthday.command(name="set", description="Set your birthday")
     async def set_birthday(self, ctx: discord.ApplicationContext):

@@ -24,7 +24,7 @@ class BirthdayModal(discord.ui.Modal):
 
             birthday_date = datetime(year, month, day).date()
         except ValueError:
-            await interaction.response.send_message(
+            await interaction.respond(
                 "Invalid date entered."
                 "Make sure day is a number,"
                 "month is full/short name, year is a number.",
@@ -38,6 +38,6 @@ class BirthdayModal(discord.ui.Modal):
         birthday.guild = interaction.guild.id
         await birthday.save()
 
-        await interaction.response.send_message(
+        await interaction.respond(
             f"Birthday set to {birthday_date.strftime('%B %-d, %Y')}", ephemeral=True
         )

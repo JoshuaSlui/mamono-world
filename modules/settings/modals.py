@@ -3,8 +3,10 @@ from discord.ui import Modal, InputText
 from managers import settings_manager, SettingsManager
 from managers.settings.guild_settings import SettingKey
 
+
 def is_truthy(value):
     return str(value).strip().lower() in ("true", "1", "yes", "on", "y", "t", "enabled", "enable")
+
 
 class JoinLogModal(Modal):
     def __init__(self, guild: discord.Guild, channel: discord.TextChannel = None, enabled: str = "", message: str = ""):

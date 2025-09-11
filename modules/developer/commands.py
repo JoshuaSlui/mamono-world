@@ -1,7 +1,4 @@
-from logging import Logger
-
 import discord
-from discord import commands
 from discord.ext import commands as ext_commands
 
 from controllers.logger import setup_logger
@@ -54,14 +51,14 @@ class EvalModal(discord.ui.Modal):
             result = f"Error:\n{e}"
 
         is_ephemeral = False if self.children[1].value.lower() == "false" else True
-        await interaction.response.send_message(f"```py\n{result}\n```", ephemeral=is_ephemeral)
+        await interaction.respond(f"```py\n{result}\n```", ephemeral=is_ephemeral)
 
 
 class EvalCog(discord.Cog):
     def __init__(self, bot: discord.Bot):
         self.bot = bot
 
-    developer = commands.SlashCommandGroup("developer", "Developer commands")
+    developer = discord.SlashCommandGroup("developer", "Developer commands")
 
     @ext_commands.is_owner()
     @developer.command(name="eval", description="Run dynamic python code")

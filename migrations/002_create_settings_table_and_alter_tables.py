@@ -2,6 +2,7 @@ from controllers.database import execute
 from controllers.utility import Config
 config = Config()
 
+
 async def upgrade():
     await execute("""
         CREATE TABLE settings (
@@ -31,6 +32,7 @@ async def upgrade():
         UPDATE birthdays SET birthdays.guild = %s WHERE guild IS NULL;
         UPDATE levels SET levels.guild = %s WHERE guild IS NULL;
     """, [config.get("guild_id")[0], config.get("guild_id")[0]])
+
 
 async def downgrade():
     await execute("""

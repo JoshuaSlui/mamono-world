@@ -4,4 +4,4 @@ from ORM import Setting
 
 settings_manager = SettingsManager(Setting, SettingKey)
 
-__all__ = [settings_manager, SettingsManager, SettingKey]
+__all__ = ["settings_manager", "SettingsManager", "SettingKey"]

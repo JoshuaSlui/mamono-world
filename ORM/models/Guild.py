@@ -3,6 +3,7 @@ import discord
 from . import AsyncORMBase
 from controllers.database import execute
 
+
 class Guild(AsyncORMBase):
     table_name = "guilds"
     pk_field = "id"

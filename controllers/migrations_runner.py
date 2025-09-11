@@ -5,6 +5,7 @@ from controllers import setup_logger
 
 logger = setup_logger()
 
+
 async def apply_migrations():
     await execute("""
         CREATE TABLE IF NOT EXISTS migrations (
@@ -30,6 +31,7 @@ async def apply_migrations():
         logger.info(f"🔧 Applying migration: {name}")
         await mod.upgrade()
         await execute("INSERT INTO migrations (name) VALUES (%s)", (name,))
+
 
 async def revert_migration(name: str):
     filepath = os.path.join(os.path.dirname(__file__), "..", "migrations", f"{name}.py")

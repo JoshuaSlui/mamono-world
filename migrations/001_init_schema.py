@@ -46,7 +46,7 @@ async def upgrade():
         INSERT INTO guilds (id, owner_id, name) VALUES (%s, %s, 'Initial server') ON DUPLICATE KEY UPDATE id = id;
     """, [
         config.get('guild_id')[0],  # Replace with your actual guild ID
-        1 # You can change this with the eval command later
+        1  # You can change this with the eval command later
     ])
 
 

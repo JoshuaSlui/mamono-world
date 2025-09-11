@@ -1,5 +1,6 @@
 from controllers.database import execute
 
+
 async def upgrade():
     # Step 1: Rename current `id` to `user`
     await execute("""
@@ -19,7 +20,6 @@ async def upgrade():
         ALTER TABLE birthdays
         CHANGE COLUMN id user BIGINT NOT NULL;
     """)
-
 
     # Step 3: Drop old UNIQUE on `user` (update name if different)
     await execute("""
@@ -47,6 +47,7 @@ async def upgrade():
         ALTER TABLE birthdays
         ADD UNIQUE KEY unique_user_per_guild (user, guild);
     """)
+
 
 async def downgrade():
     # Step 1: Drop new UNIQUE constraint
